@@ -2,8 +2,6 @@ use Test::More 'no_plan';
 
 use Proc::Exists qw(pexists);
 
-ok(Proc::Exists::supported());
-
 #make sure this process exists
 ok(pexists($$));
 #this process and init should give a count of 2

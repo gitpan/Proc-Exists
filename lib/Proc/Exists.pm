@@ -3,74 +3,33 @@ package Proc::Exists;
 use warnings;
 use strict;
 
-$Proc::Exists::VERSION = '0.01';
-
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(pexists);
 
-#0.01 testing:
-# linuces: {gutsy|gutsy-mtab|feisty}, {sarge/2.4|etch}
-#             ok      ok       ok         ok      ok
-# FBSD 4.11/6.2, obsd4.0, netbsd3.1, solaris 10, mac os X, windows
-#       ok   ok     ?        ?           ok        ?         ?
+$Proc::Exists::VERSION = '0.02';
 
-my $supported; 
-sub supported {
-	#have we already checked?
-	return $supported if(defined($supported)); 
+#TODO: THINK: is there a way to do this in pure perl w/o depending
+#on something icky like /proc / ps auxww parsing?
 
-	#fastest way to determine mounts is via /etc/mtab on linux
-	my (@mounts, $re); 
-	if(open(my $mtab, "<", "/etc/mtab")) {
-		@mounts = grep { /^(none|proc)\s+\S+\s+proc/ } <$mtab>; 
-		close($mtab);
-	#invoke mount if no /etc/mtab (presumably non-linux)
-	} elsif(my $mount = `which mount`) {
-		#everybody is special! so many special formats! awesome!
-		@mounts = grep { m{^
-			(	\S+\s+on\s+proc |          #solaris: /proc on proc
-				(linprocfs|procfs)\s+on |  #freebsd: (linprocfs|procfs) on /proc
-				#linux: (proc|none) on /proc type proc
-				(proc|none)\s+on\s+\S+\s+type\s+proc
-			) }x } `$mount`; 
-	}
+require XSLoader;
+XSLoader::load('Proc::Exists', $Proc::Exists::VERSION);
 
-	if(@mounts) {
-		my $mount = $mounts[0];
-		#no matter the format, the word with a leading slash is our path.
-		#so, split the first 3 words off, chuck the remainder, and take
-		#the first word with a leading slash to be our path
-		$mount = (grep { /^\// } (split(/\s+/, $mount, 4))[0..3])[0];
-		if($mount) {
-			$supported = "procfs:$mount"; 
-			$Proc::Exists::pexists_sub = sub { return (-d "$mount/".$_[0]) };
-			return $supported; 
-		}
-	#we should have a ps binary even if /proc isn't mounted
-	} elsif(my $ps = `which ps`) {
-		#TODO: parse ps auxww or ps ef or something like it
-	} else {
-		#TODO: other tests
-	}
+#0.02 testing:
+# linuces: {gutsy/amd64|feisty/ppc}, {sarge/2.4/x86|etch/amd64}, (need rpm-ers)
+#               ok         ok            ok            ok
+# BSDs: FBSD 4.11/6.2, obsd4.0, netbsd3.1
+#             ok   ok     ?        ?    
+# misc: solaris 10, mac os X, windows
+#           ?         ?         no
 
-	return;
-}
-
-#TODO: generate pexists, not just pexists_sub, at
-#      supported() / first call time
 sub pexists {
 	my @pids = @_; 
 	my %args = %{ref($_[-1]) ? pop(@pids) : {}};
 
-	#first call to pexists, and we haven't yet called supported()
-	if(!defined($Proc::Exists::pexists_sub)) {
-		die "unsupported system" unless supported();
-	}
-
 	my @results; 
 	foreach my $pid (@pids) {
-		if($Proc::Exists::pexists_sub->($pid)) {
+		if(_pexists($pid)) {
 			if($args{any}) { return 1; }
 			push @results, $pid; 
 		} elsif($args{all}) {
@@ -97,10 +56,6 @@ This document describes Proc::Exists version 0.0.1
 
    use Proc::Exists qw(pexists);
 
-	#optionally, check for system support (if you don't, this check
-	#will happen during your first pexists() call)
-   Proc::Exists::supported() || die "/proc filesystem not detected";
-
    my $dead_or_alive       = pexists($pid); 
    my @survivors           = pexists(@pid_list); 
    my $nsurvivors          = pexists(@pid_list); 
@@ -110,11 +65,8 @@ This document describes Proc::Exists version 0.0.1
   
 =head1 FUNCTIONS
 
-=head2 pexists( @pids, [ $argsref ] )
+=head2 pexists( @pids, [ $args_hashref ] )
 Supported arguments are 'any' and 'all'. See description above.
-
-=head2 supported()
-Returns a true value if the /proc filesystem is mounted.
 
 =head1 DESCRIPTION
 
@@ -122,31 +74,19 @@ A quick and simple module for checking whether a process exists or
 not.
 
 
-=head1 INTERFACE 
-
-Only the pexists sub can be exported. supported() must be called as
-Proc::Exists::supported().
-
-
-=head1 DIAGNOSTICS
-
-If Proc::Exists::supported() cannot find a mechanism for
-finding processes, it will return a false value.
-
-
 =head1 DEPENDENCIES
 
-None.
+- a c compiler
+- Test::More (for running test scripts)
 
 
 =head1 INCOMPATIBILITIES
 
-None reported.
+Windows, and Mac OS 9 and under probably doesn't work. There are 
+probably others - but this should work on any POSIX-y OS.
 
 
 =head1 BUGS AND LIMITATIONS
-
-Currently requires a mounted /proc filesystem.
 
 Please report any bugs or feature requests to
 C<bug-proc-exists@rt.cpan.org>, or through the web interface at
