@@ -2,26 +2,39 @@ package Proc::Exists;
 
 use warnings;
 use strict;
+use vars qw (@ISA @EXPORT_OK $VERSION); 
 
 require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(pexists);
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(pexists);
 
-$Proc::Exists::VERSION = '0.02';
+$VERSION = '0.03';
 
-#TODO: THINK: is there a way to do this in pure perl w/o depending
-#on something icky like /proc / ps auxww parsing?
+eval {
+	require XSLoader;
+	XSLoader::load('Proc::Exists', $VERSION); 
+}; if($@) {
+	*_pexists = \&pp_pexists;
+	#warn "using pure perl mode, expect degraded performance\n";
+}
 
-require XSLoader;
-XSLoader::load('Proc::Exists', $Proc::Exists::VERSION);
+sub pp_pexists {
+	my $pid = shift;
+	if(kill(0, $pid)) { return 1 }
+	else { return ($! =~ /^
+		Operation\s+not\s+permitted | #linux
+		Not\s+owner                   #solaris
+	/x) }
+}
 
-#0.02 testing:
+#0.03 testing:
 # linuces: {gutsy/amd64|feisty/ppc}, {sarge/2.4/x86|etch/amd64}, (need rpm-ers)
-#               ok         ok            ok            ok
-# BSDs: FBSD 4.11/6.2, obsd4.0, netbsd3.1
-#             ok   ok     ?        ?    
-# misc: solaris 10, mac os X, windows
-#           ?         ?         no
+#               ok         ok            ok             ok 
+# BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.0/x86, netbsd3.1/x86
+#            ok            ok            ?           ?
+# misc: solaris10/x86, osX/ppc, osX/x86, windows, MacOS9
+#           ok            ?        ?       no       ?
+# exotic: VMS, BeOS, RISCOS, Netware3, ...
 
 sub pexists {
 	my @pids = @_; 
@@ -49,7 +62,7 @@ Proc::Exists - quickly check for process existence
 
 =head1 VERSION
 
-This document describes Proc::Exists version 0.0.1
+This document describes Proc::Exists version 0.03
 
 
 =head1 SYNOPSIS
@@ -66,31 +79,43 @@ This document describes Proc::Exists version 0.0.1
 =head1 FUNCTIONS
 
 =head2 pexists( @pids, [ $args_hashref ] )
-Supported arguments are 'any' and 'all'. See description above.
+Supported arguments are 'any' and 'all'. See details above.
+
 
 =head1 DESCRIPTION
 
-A quick and simple module for checking whether a process exists or
-not.
+A simple and fast module for checking whether a process exists or
+not, regardless of whether it is a child of this process or has the
+same owner. Currently implemented via sending a 0 (test) signal to
+the pid of the process to check and examining the result, which is
+POSIX-blessed.
 
 
 =head1 DEPENDENCIES
 
-- a c compiler
-- Test::More (for running test scripts)
+	* a POSIX-y OS
+	* Test::More if you want to run 'make test'
 
 
 =head1 INCOMPATIBILITIES
 
 Windows, and Mac OS 9 and under probably doesn't work. There are 
-probably others - but this should work on any POSIX-y OS.
+probably others - but any POSIX-y OS will be fine.
+
+Also, if you don't have a C compiler, and you're not running linux, 
+Solaris, or FreeBSD, you might not pass make test. This is because
+in pure-perl mode, we rely on string representation of errno in
+$!, which differs from OS to OS. If you find yourself on such a
+system, run "perl -le 'kill 0, 1; print $!'" and please send me
+the output at C<< <ski-cpan@allafrica.com> >> with Proc::Exists
+in the subject line. Meanwhile you can patch your own source by
+adding your string to pp_pexists in lib/Proc/Exists.pm.
 
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to
-C<bug-proc-exists@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+Please report any bugs or feature requests through the
+web interface at L<http://rt.cpan.org>.
 
 
 =head1 AUTHOR

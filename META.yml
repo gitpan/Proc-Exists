@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Proc-Exists
-version:             0.02
+version:             0.03
 abstract:            quickly check for process existence
 license:             ~
 generated_by:        ExtUtils::MakeMaker version 6.36
