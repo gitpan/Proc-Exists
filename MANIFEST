@@ -1,6 +1,7 @@
 Changes
 Exists.xs
 MANIFEST
+META.yml
 Makefile.PL
 README
 lib/Proc/Exists.pm

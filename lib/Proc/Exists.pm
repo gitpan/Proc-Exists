@@ -5,10 +5,10 @@ use strict;
 use vars qw (@ISA @EXPORT_OK $VERSION); 
 
 require Exporter;
-@ISA = qw(Exporter);
+use base 'Exporter'; #@ISA = qw(Exporter);
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 eval {
 	require XSLoader;
@@ -18,13 +18,14 @@ eval {
 	#warn "using pure perl mode, expect degraded performance\n";
 }
 
+#note: this sub has unusual formatting to appease Perl::Critic
 sub pp_pexists {
-	my $pid = shift;
-	if(kill(0, $pid)) { return 1 }
-	else { return ($! =~ /^
-		Operation\s+not\s+permitted | #linux
-		Not\s+owner                   #solaris
-	/x) }
+ my $pid = shift;
+ if(kill(0, $pid)) { return 1 }
+ else { return ($! =~ m/^
+  Operation\s+not\s+permitted | #linux
+  Not\s+owner                   #solaris
+ $/mx) }
 }
 
 #0.03 testing:
@@ -38,7 +39,7 @@ sub pp_pexists {
 
 sub pexists {
 	my @pids = @_; 
-	my %args = %{ref($_[-1]) ? pop(@pids) : {}};
+	my %args = %{ref($pids[-1]) ? pop(@pids) : {}};
 
 	my @results; 
 	foreach my $pid (@pids) {
