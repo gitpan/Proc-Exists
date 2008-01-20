@@ -8,34 +8,38 @@ require Exporter;
 use base 'Exporter'; #@ISA = qw(Exporter);
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 eval {
 	require XSLoader;
 	XSLoader::load('Proc::Exists', $VERSION); 
 }; if($@) {
-	*_pexists = \&pp_pexists;
 	#warn "using pure perl mode, expect degraded performance\n";
+	my $pp_pexists = sub {
+		my $pid = shift;
+		if(kill(0, $pid)) { return 1 }
+		else { return ($! =~ m/^
+			Operation\s+not\s+permitted | #linux
+			Not\s+owner                   #solaris
+		$/mx) }
+	};
+	*_pexists = \&$pp_pexists; 
 }
 
-#note: this sub has unusual formatting to appease Perl::Critic
-sub pp_pexists {
- my $pid = shift;
- if(kill(0, $pid)) { return 1 }
- else { return ($! =~ m/^
-  Operation\s+not\s+permitted | #linux
-  Not\s+owner                   #solaris
- $/mx) }
-}
-
-#0.03 testing:
+#last tested version list, ? = not yet tested
 # linuces: {gutsy/amd64|feisty/ppc}, {sarge/2.4/x86|etch/amd64}, (need rpm-ers)
-#               ok         ok            ok             ok 
-# BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.0/x86, netbsd3.1/x86
-#            ok            ok            ?           ?
-# misc: solaris10/x86, osX/ppc, osX/x86, windows, MacOS9
-#           ok            ?        ?       no       ?
-# exotic: VMS, BeOS, RISCOS, Netware3, ...
+#              0.05        0.05          0.05           0.05
+# BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.2/x86, netbsd3.1/x86
+#           0.05          0.05         0.05          ?
+# misc: solaris10/x86, osX/ppc, osX/x86, mac OS 9, mac OS 8, mac OS 7
+#          0.05           ?        ? 
+# win/cygwin:      XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
+#                  0.05  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
+# win/strawberry:  XP32 XP64 vista vista64 w2k ws2k3
+#                  0.05  ?     ?      ?     ?    ? 
+# win/activestate: XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
+#                   ?    ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
+# others? does anyone run perl on VMS, BeOS, RISCOS, Netware3 ?
 
 sub pexists {
 	my @pids = @_; 
@@ -43,7 +47,9 @@ sub pexists {
 
 	my @results; 
 	foreach my $pid (@pids) {
-		if(_pexists($pid)) {
+		my $ret = _pexists($pid); 
+		die "Proc::Exists - our win32 goop failed us: ret: $ret, pid: $pid - please report this bug" if($ret < 0);
+		if($ret) {
 			if($args{any}) { return 1; }
 			push @results, $pid; 
 		} elsif($args{all}) {
@@ -63,7 +69,7 @@ Proc::Exists - quickly check for process existence
 
 =head1 VERSION
 
-This document describes Proc::Exists version 0.03
+This document describes Proc::Exists
 
 
 =head1 SYNOPSIS

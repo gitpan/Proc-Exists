@@ -1,5 +1,21 @@
 Revision history for Proc-Exists
 
-0.0.1  Thu Jan 17 14:44:02 2008
-       Initial release.
+0.05  20-Jan-2008 11:41
+      - Win32/XS support
+      - Remove POD/PCritic tests from MANIFEST, distribution (still in svn)
+      - Many Kwalitee, PCritic cleanups, including updating this file ;-)
+      - Add benchmarking info in BENCHMARKS
+      - Micro-mem-optimization - pp_pexists never lives in memory with XS
+
+0.04  19-Jan-2008 06:39
+      - Fix some failing tests due to Perl::Critic
+
+0.03  19-Jan-2008 03:13
+      - Fall back to pureperl when XS isunavailable
+
+0.02  18-Jan-2008 23:57
+      - Use kill via XS instead of using /proc
+
+0.01  18-Jan-2008 18:36
+      - Initial release.
 
