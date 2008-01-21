@@ -1,11 +1,11 @@
 BENCHMARKS
 Changes
+Exists.pm
 Exists.xs
 MANIFEST
 META.yml
 Makefile.PL
 README
-lib/Proc/Exists.pm
 ppport.h
 t/00.load.t
 t/01.usage.t

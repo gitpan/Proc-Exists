@@ -4,14 +4,14 @@
 #ifdef WIN32
 #include <windows.h>
 #include <tlhelp32.h>
+#else
+#include <sys/types.h>
+#include <signal.h>
+#include <errno.h>
 #endif
 
 #include "ppport.h"
 
-//not sure which if any of these we need...
-#include <sys/types.h>
-#include <signal.h>
-#include <errno.h>
 
 MODULE = Proc::Exists		PACKAGE = Proc::Exists		
 
@@ -45,6 +45,18 @@ _pexists(pid)
 				CloseHandle( hProcessSnap );
 			}
 		}
+
+		//HANDLE hProcess;
+		//PROCESSENTRY32 pe32;
+		//DWORD err;
+
+		//hProcess = OpenProcess( PROCESS_QUERY_INFORMATION, FALSE, pid );
+		//if(hProcess == NULL) { 
+		//	RETVAL = 0;
+		//} else {
+		//	RETVAL = 1;
+		//	CloseHandle( hProcess );
+		//}
 #else
 		int ret = kill(pid, 0);
 		//existent process w/ perms:  ret: 0

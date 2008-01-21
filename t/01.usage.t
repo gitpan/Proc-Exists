@@ -13,8 +13,9 @@ if($^O eq "MSWin32") {
 	#note cygwin never gets here, it returns $^O eq "cygwin"
 	#System Idle process is always at pid 0 on winXP, and hopefully
 	#others. also "System": is at 8 in w2k, 4 in XP/server 2003
-	$another_pid = 0; #System Idle Process on Windows XP
-	@pids_to_strobe = (0..999);
+	$another_pid = 4; #System Idle Process on Windows XP
+	#note on windows xp, pids are always =0 mod 4 (?!)
+	@pids_to_strobe = map { $_ * 4 } (0..19999);
 } elsif (!$another_pid) {
 	$another_pid = 1; #gulp, hopefully there is something init-esque w/ pid 1?
 }
