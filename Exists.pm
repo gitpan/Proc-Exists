@@ -8,7 +8,7 @@ require Exporter;
 use base 'Exporter'; #@ISA = qw(Exporter);
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 eval {
 	require XSLoader;
