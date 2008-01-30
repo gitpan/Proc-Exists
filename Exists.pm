@@ -8,8 +8,9 @@ require Exporter;
 use base 'Exporter'; #@ISA = qw(Exporter);
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
+my $use_scalar_pexists = 1;
 eval {
 	require XSLoader;
 	XSLoader::load('Proc::Exists', $VERSION); 
@@ -23,20 +24,26 @@ eval {
 			Not\s+owner                   #solaris
 		$/mx) }
 	};
+	$use_scalar_pexists = 0;
 	*_pexists = \&$pp_pexists; 
 }
 
 #last tested version list, ? = not yet tested
+# POSIX/UNIX-y OS's are tested both with and without cc
 # linuces: {gutsy/amd64|feisty/ppc}, {sarge/2.4/x86|etch/amd64}
-#              0.05        0.05          0.05           0.05
+#              0.08        0.08          0.08           0.08
 # BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.2/x86, netbsd3.1/x86
-#          0.05           0.05         0.05          ?
+#          0.08           0.08         0.08          ?
 # misc: solaris10/x86, osX/ppc, osX/x86, mac OS 9, mac OS 8, mac OS 7
-#          0.05           ?        ? 
+#          0.08           ?        ? 
+# win/cygwin/PP:   XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
+#                  0.08  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
 # win/cygwin:      XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
-#                  0.05  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
+#                  0.08  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
+# win/strawbery/PP:XP32 XP64 vista vista64 w2k ws2k3
+#                  FAIL  ?     ?      ?     ?    ? 
 # win/strawberry:  XP32 XP64 vista vista64 w2k ws2k3
-#                  0.05  ?     ?      ?     ?    ? 
+#                  0.08  ?     ?      ?     ?    ? 
 # win/activestate: XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
 #                   ?    ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
 # others? does anyone run perl on VMS, BeOS, RISCOS, Netware3 ?
@@ -46,18 +53,22 @@ sub pexists {
 	my %args = %{ref($pids[-1]) ? pop(@pids) : {}};
 
 	my @results; 
-	foreach my $pid (@pids) {
-		my $ret = _pexists($pid); 
-warn "pid: $pid, ret: $ret" if($^O eq "MSWin32");
-		die "Proc::Exists - our win32 goop failed us: ret: $ret, pid: $pid - please report this bug" if($ret < 0);
-		if($ret) {
-			if($args{any}) { return 1; }
-			push @results, $pid; 
-		} elsif($args{all}) {
-			return 0;
+	if(wantarray || !$use_scalar_pexists) {
+		foreach my $pid (@pids) {
+			my $ret = _pexists($pid); 
+#warn "pid: $pid, ret: $ret" if($^O eq "MSWin32");
+			die "Proc::Exists - our win32 goop failed us: ret: $ret, pid: $pid - please report this bug" if($ret < 0);
+			if($ret) {
+				if($args{any}) { return 1; }
+				push @results, $pid; 
+			} elsif($args{all}) {
+				return 0;
+			}
 		}
+		return wantarray ? @results : scalar @results; 
+	} else {
+		return _scalar_pexists([@pids], $args{any} || 0, $args{all} || 0); 
 	}
-	return wantarray ? @results : scalar @results; 
 }
 
 1;
@@ -95,14 +106,15 @@ Supported arguments are 'any' and 'all'. See details above.
 
 A simple and fast module for checking whether a process exists or
 not, regardless of whether it is a child of this process or has the
-same owner. Currently implemented via sending a 0 (test) signal to
-the pid of the process to check and examining the result, which is
-POSIX-blessed.
+same owner. 
+
+On POSIX systems, this is implemented by sending a 0 (test) signal to
+the pid of the process to check and examining the result and errno.
 
 
 =head1 DEPENDENCIES
 
-	* a POSIX-y OS
+	* a POSIX-y OS or win32
 	* Test::More if you want to run 'make test'
 
 
@@ -112,8 +124,8 @@ There is no pure perl implementation under Windows. However, with
 Strawberry Perl L<http://strawberryperl.com/>, this should be less
 of an issue.
 
-Any OS without a POSIX emulation layer will probably be completely 
-non-functional (unless it implements C<kill()>).
+Any other OS without a POSIX emulation layer will probably be
+completely non-functional (unless it implements C<kill()>).
 
 It's possible that if you don't have a C compiler, and you're not
 running an obscure UNIX-y OS (read: not linux, *BSD, solaris, or

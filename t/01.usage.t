@@ -7,6 +7,7 @@ my @pids_to_strobe = (1..99999);
 #for some of these tests we need >1 process, but we don't care what
 #that other process is, so long as it is in memory for the duration
 #of this test.
+my $nonexistent_pid = 99999; #TODO: is there any OS that could have this?
 my $another_pid;
 eval { $another_pid = getppid(); };
 if($^O eq "MSWin32") {
@@ -27,10 +28,21 @@ ok(2 == pexists($another_pid, $$));
 #check array context return
 my @t = pexists($another_pid, $$);
 #also check *order* of results
+ok(@t == 2);
 ok($t[0] == $another_pid);
 ok($t[1] == $$);
-#check shortcutting with "any" arg
+#check return values from "any" and "all" args
 ok(1 == pexists($another_pid, $$, {any => 1}));
+ok(2 == pexists($another_pid, $$, {all => 1}));
+
+#three-way tests - 2 exist, 1 doesn't, test any and all and plain
+ok(2 == pexists($$, $another_pid, $nonexistent_pid));
+@t = pexists($$, $another_pid, $nonexistent_pid);
+ok(@t == 2);
+ok($t[0] == $$);
+ok($t[1] == $another_pid);
+ok(1 == pexists($$, $another_pid, $nonexistent_pid, {any => 1}));
+ok(0 == pexists($$, $another_pid, $nonexistent_pid, {all => 1}));
 
 #TODO: these tests are non-deterministic, unless our range a) covers
 #a process we're guaranteed won't go away (e.g. parent on unix, idle on win)
@@ -38,6 +50,10 @@ ok(1 == pexists($another_pid, $$, {any => 1}));
 #strobe must be long enough that we'll get both hits and misses, but
 #small enough to run relatively quickly
 
+#check array form (slow)
+@t = pexists(@pids_to_strobe);
+ok(scalar @t <  scalar @pids_to_strobe);
+#tests on scalar form follow...
 ok(pexists(@pids_to_strobe) < scalar @pids_to_strobe);
 #check shortcutting with "any" arg, again
 ok(1 == pexists(@pids_to_strobe, {any => 1}));
