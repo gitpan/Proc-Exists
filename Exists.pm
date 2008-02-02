@@ -8,7 +8,7 @@ require Exporter;
 use base 'Exporter'; #@ISA = qw(Exporter);
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 my $use_scalar_pexists = 1;
 eval {
@@ -133,7 +133,7 @@ Mac OS X), you might not pass make test. This is because in
 pure-perl mode, we rely on string representation of errno in C<$!>,
 which differs from OS to OS. If you find yourself on such a
 system, run C<perl -le 'kill 0, 1; print $!'> and please send me
-the output at C<< <ski-cpan@allafrica.com> >> with Proc::Exists
+the output at B<< <ski-cpan@allafrica.com> >> with Proc::Exists
 in the subject line. Meanwhile you can patch your own source by
 adding your string to C<pp_pexists> in C<lib/Proc/Exists.pm>.
 
@@ -146,12 +146,12 @@ web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Brian Szymanski  C<< <ski-cpan@allafrica.com> >>
+Brian Szymanski  B<< <ski-cpan@allafrica.com> >>
 
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2008, Brian Szymanski C<< <ski-cpan@allafrica.com> >>.
+Copyright (c) 2008, Brian Szymanski B<< <ski-cpan@allafrica.com> >>.
 All rights reserved.
 
 This module is free software; you can redistribute it and/or

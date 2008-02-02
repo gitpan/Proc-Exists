@@ -1,5 +1,8 @@
 Revision history for Proc-Exists
 
+0.09  02-Feb-2008 08:31 GMT
+      - nuttin but kwalitee and POD tweaks
+
 0.08  30-Jan-2008 07:07 GMT
       - more tests
       - optimized for the many processes case via _scalar_pexists()
