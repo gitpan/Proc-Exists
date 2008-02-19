@@ -1,6 +1,6 @@
 package Proc::Exists;
 
-use warnings;
+BEGIN { eval { require warnings; }; }; #it's ok if we can't load warnings
 use strict;
 use vars qw (@ISA @EXPORT_OK $VERSION); 
 
@@ -8,7 +8,7 @@ require Exporter;
 use base 'Exporter'; #@ISA = qw(Exporter);
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 my $use_scalar_pexists = 1;
 eval {
@@ -35,7 +35,7 @@ eval {
 # BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.2/x86, netbsd3.1/x86
 #          0.08           0.08         0.08          ?
 # misc: solaris10/x86, osX/ppc, osX/x86, mac OS 9, mac OS 8, mac OS 7
-#          0.08           ?        ? 
+#          0.08           ?       0.09      ?         ?         ? 
 # win/cygwin/PP:   XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
 #                  0.08  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
 # win/cygwin:      XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme

@@ -1,6 +1,5 @@
 #!perl
 $|++;
-use 5.006;
 use ExtUtils::MakeMaker;
 
 use Config qw(%Config); #for $Config{cc}
@@ -25,8 +24,11 @@ my %Makefile = (
 	LIBS              => [''], # e.g., '-lm'
 	DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
 	INC               => '-I.', # e.g., '-I. -I/usr/include/other'
-	($ExtUtils::MakeMaker::VERSION >= 6.31 ? # at least, probably earlier...
-		(LICENSE       => 'perl') : ()),
+	#MakeMaker LICENSE support: 6.30 - no, 6.30_0[1234] - yes, 6.31 - yes
+	#also use NO_META here, which is kind of a hack but the machine I 
+	#build on will always have it (>= 6.10_03)
+	($ExtUtils::MakeMaker::VERSION > 6.30 ?
+		(LICENSE => 'perl', NO_META => 1) :()),
 	##Un-comment this if you add C files to link with later:
 	# OBJECT          => '$(O_FILES)', # link all the C files too
 	XS            => {},
@@ -57,17 +59,16 @@ sub use_pure_perl {
 	#
 	print "Testing if you have a working C compiler and the needed header files... ";
 
-	my $fh; 
-	return "cannot write compile.c" unless open($fh, ">compile.c");
+	return "cannot write compile.c" unless open(FH, ">compile.c");
 
-	print $fh <<'EOF';
+	print FH <<'EOF';
 #include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
 int main() { return 0; }
 EOF
 
-	return "cannot close compile.c" unless close($fh); 
+	return "cannot close compile.c" unless close(FH); 
 
 	my $cmd = "$Config{'cc'}  -c compile.c -o compile$Config{obj_ext}"; 
 	my $ret = system($cmd);

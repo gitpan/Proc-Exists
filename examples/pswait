@@ -1,0 +1,89 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Proc::Exists qw(pexists);
+
+my $interval = 0.01;
+my $any      = 0;
+
+#note, synonyms defined for compatibility with Proc::ProcessTable version
+while(defined($ARGV[0]) && ($ARGV[0] =~ /^\-/)) {
+	my $arg = shift(@ARGV);
+	#-a, -e, -any, -exit are all synonyms
+	if($arg =~ /^\-+[ae]/) {
+		$any = 1
+	#-s, -i, -sleep, -interval are all synonyms
+	} elsif($arg =~ /^\-+[is]/) {
+		if($arg =~ /=/) {
+			$interval = $arg;
+			$interval =~ s/^.*=//;
+		} else {
+			#next argument is interval
+			$interval = shift(@ARGV);
+		}
+	} else {
+		die "usage: $0 [ -[is]=interval | -[ae] ] pid1, pid2... pidn\n";
+	}
+}
+
+my @pids = grep { $_ != $$ } @ARGV; #don't ever wait on self, assume user
+                                    #was interested in some old process
+while(@pids) {
+	my $npids = @pids;
+	@pids = pexists(@pids);
+	last if($any && ($npids != @pids));
+	select(undef, undef, undef, $interval); #sleep with <1sec resolution
+}
+
+__END__
+
+=head1 NAME
+
+pswait - wait for a number of processes to end, consuming far less
+CPU than the script of the same name from Proc::ProcessTable (but 
+without some features, see below)
+
+=head1 SYNOPSIS
+
+pswait [options] pid1, pid2, ... pidn
+
+=head1 USAGE
+
+Options:
+   -a --any           exit after the first of these procs end
+                      alias -e, --exit
+   -i=# --interval=#  change how often we poll (default .01sec)
+                      alias -s, --sleep
+
+=head1 OPTIONS
+
+=over 3
+
+=item B<-a, --any>
+
+Terminate as soon as any of these processes are gone, instead of waiting 
+on them all, which is the default behavior.
+
+=item B<-i, --interval>
+
+Amount of time (in seconds, fractions ok) to wait between checking for 
+process updates. Note that this check is cheap, and even if you are 
+checking lots of processes, specifying a value near your machine's HZ 
+value is probably fine.
+
+=back
+
+=head1 AUTHOR
+
+Brian Szymanski B<< <ski-cpan@allafrica.com> >>
+
+=head1 LICENSE
+
+Unlike Proc::Exists, which is under the same license as perl, this 
+script is in the public domain. Where that is not legally possible,
+the right to use this script for any purpose, without any conditions,
+is granted to anyone, unless such conditions are required by law.
+
+=cut

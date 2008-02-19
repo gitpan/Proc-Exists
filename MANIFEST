@@ -6,6 +6,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+examples/pswait
 ppport.h
 t/00.load.t
 t/01.usage.t

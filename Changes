@@ -1,5 +1,9 @@
 Revision history for Proc-Exists
 
+0.10  19-Feb-2008 07:27 GMT
+      - compatibility with perl 5.5.x
+      - add examples/pswait
+
 0.09  02-Feb-2008 08:31 GMT
       - nuttin but kwalitee and POD tweaks
 
