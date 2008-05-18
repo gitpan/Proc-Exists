@@ -1,5 +1,10 @@
 Revision history for Proc-Exists
 
+0.11  17-May-2008 23:35 GMT
+		- win32 code made simpler AND faster, w00t.
+		- various hacks to make solaris10 work with a stubbed cc
+		  but a real gcc
+
 0.10  19-Feb-2008 07:27 GMT
       - compatibility with perl 5.5.x
       - add examples/pswait

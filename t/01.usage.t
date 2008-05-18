@@ -10,15 +10,33 @@ my @pids_to_strobe = (1..99999);
 my $nonexistent_pid = 99999; #TODO: is there any OS that could have this?
 my $another_pid;
 eval { $another_pid = getppid(); };
-if($^O eq "MSWin32") {
+# win32 crud
+if ($^O eq 'MSWin32') {
 	#note cygwin never gets here, it returns $^O eq "cygwin"
 	#System Idle process is always at pid 0 on winXP, and hopefully
 	#others. also "System": is at 8 in w2k, 4 in XP/server 2003
 	$another_pid = 4; #System Idle Process on Windows XP
-	#note on windows xp, pids are always =0 mod 4 (?!)
-	@pids_to_strobe = map { $_ * 4 } (0..19999);
+	#note on windows xp, pids are always =0 mod 4
+	#http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
+	if(defined($ENV{OS})) {
+		if($ENV{OS} eq "Windows_NT") {
+			#apparently w95 pids were "regularly in the 4billion range"
+			#so let's hope... say... 99999*4 never matches
+			@pids_to_strobe = map { $_ * 4 } (0..19999);
+			$nonexistent_pid = 99999 * 4; #here's hoping!
+		} else {
+			# win95/98/me, i presume...
+			warn "wow, will i really run on $ENV{OS}?"; 
+		}
+	} else {
+		warn "unsupported win32 OS - no \$ENV{OS} set...";
+	}
 } elsif (!$another_pid) {
-	$another_pid = 1; #gulp, hopefully there is something init-esque w/ pid 1?
+	if($^O eq "darwin") {
+		$another_pid = 0;
+	} else {
+		$another_pid = 1; #gulp, hopefully there is something init-esque w/ pid 1?
+	}
 }
 
 #make sure this process exists
@@ -59,3 +77,12 @@ ok(pexists(@pids_to_strobe) < scalar @pids_to_strobe);
 ok(1 == pexists(@pids_to_strobe, {any => 1}));
 #make sure "all" arg works properly
 ok(0 == pexists(@pids_to_strobe, {all => 1}));
+#!perl
+$|++;
+use ExtUtils::MakeMaker;
+
+use Config qw(%Config); #for $Config{cc}
+
+# An existing makefile can confuse the CC test.
+unlink('Makefile');
+

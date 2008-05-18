@@ -8,9 +8,9 @@ require Exporter;
 use base 'Exporter'; #@ISA = qw(Exporter);
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
-my $use_scalar_pexists = 1;
+my $use_scalar_pexists = ($^O ne "MSWin32");
 eval {
 	require XSLoader;
 	XSLoader::load('Proc::Exists', $VERSION); 
@@ -31,19 +31,19 @@ eval {
 #last tested version list, ? = not yet tested
 # POSIX/UNIX-y OS's are tested both with and without cc
 # linuces: {gutsy/amd64|feisty/ppc}, {sarge/2.4/x86|etch/amd64}
-#              0.08        0.08          0.08           0.08
-# BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.2/x86, netbsd3.1/x86
-#          0.08           0.08         0.08          ?
-# misc: solaris10/x86, osX/ppc, osX/x86, mac OS 9, mac OS 8, mac OS 7
-#          0.08           ?       0.09      ?         ?         ? 
+#              0.11        0.11          0.11           0.11
+# BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.2/x86, netbsd4.0/x86
+#           0.11          0.11         0.11          0.11
+# misc: solaris10/x86/gcc, osX/ppc, osX/x86, mac OS 9
+#             0.11            ?       0.11      ?
 # win/cygwin/PP:   XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
-#                  0.08  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
+#                  0.11  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
 # win/cygwin:      XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
-#                  0.08  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
+#                  0.11  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
 # win/strawbery/PP:XP32 XP64 vista vista64 w2k ws2k3
 #                  FAIL  ?     ?      ?     ?    ? 
 # win/strawberry:  XP32 XP64 vista vista64 w2k ws2k3
-#                  0.08  ?     ?      ?     ?    ? 
+#                  0.11  ?     ?      ?     ?    ? 
 # win/activestate: XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
 #                   ?    ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
 # others? does anyone run perl on VMS, BeOS, RISCOS, Netware3 ?
@@ -56,8 +56,11 @@ sub pexists {
 	if(wantarray || !$use_scalar_pexists) {
 		foreach my $pid (@pids) {
 			my $ret = _pexists($pid); 
-#warn "pid: $pid, ret: $ret" if($^O eq "MSWin32");
-			die "Proc::Exists - our win32 goop failed us: ret: $ret, pid: $pid - please report this bug" if($ret < 0);
+			if($ret < 0) {
+				$ret += 2;
+				#TODO: better error message here
+				warn "windows ignored the bottom 2 bits of the pid $pid, unexpected results may occur!";
+			}
 			if($ret) {
 				if($args{any}) { return 1; }
 				push @results, $pid; 
