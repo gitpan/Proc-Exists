@@ -97,7 +97,7 @@ EOF
 
 	#sometimes $Config{CC} is not the answer (e.g. solaris10 w/ gcc but
 	#no cc package installed)...
-	my @cc_alternatives = qw ( gcc cc );
+	my @cc_alternatives = qw ( gcc cc egcs );
 	my $ret;
 	foreach my $cc ( $Config{cc}, @cc_alternatives )  {
 		print "trying $cc... "; 
@@ -124,7 +124,7 @@ if($do_hacks) {
 	system("cp Makefile Makefile.unmangled");
 	if ($do_hacks eq "solaris10_gcc") {
 		#hacks for solaris10 with gcc
-		for my $hack qw ( OPTIMIZE CCCDLFLAGS ) {
+		for my $hack ( qw ( OPTIMIZE CCCDLFLAGS ) ) {
 			system("grep -v '^$hack' Makefile >Makefile.$do_hacks"); 
 			system("cp Makefile.$do_hacks Makefile");
 		}

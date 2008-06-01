@@ -5,48 +5,43 @@ use strict;
 use vars qw (@ISA @EXPORT_OK $VERSION); 
 
 require Exporter;
-use base 'Exporter'; #@ISA = qw(Exporter);
+use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
-my $use_scalar_pexists = ($^O ne "MSWin32");
+my $use_scalar_pexists = ($^O ne 'MSWin32');
+
 eval {
 	require XSLoader;
 	XSLoader::load('Proc::Exists', $VERSION); 
 }; if($@) {
 	#warn "using pure perl mode, expect degraded performance\n";
+	my %eperm_strings = ( solaris => 'Not\s+owner' );
+	for my $os ( qw (linux freebsd openbsd netbsd darwin cygwin) ) {
+		$eperm_strings{$os} = 'Operation\s+not\s+permitted';
+	}
+	my $eperm_str = $eperm_strings{$^O};
+	#the linux-y case is more common... here's hoping...
+	if(!defined($eperm_str)) {
+		require Config;
+		my $archname = $Config::Config{archname}; 
+		my $osvers = $Config::Config{osvers}; 
+		$eperm_str = 'Operation\s+not\s+permitted';
+		warn "unknown OS in pureperl mode, you may encounter unexpected results!\n";
+		warn "please follow the instructions in the INCOMPATIBILITIES section of the perldoc\n";
+		warn "osname: $^O\narchname: $archname\nosvers: $osvers\n"; 
+	}
+	my $eperm_re = qr/^\s*$eperm_str\s*$/; 
+
 	my $pp_pexists = sub {
 		my $pid = shift;
-		if(kill(0, $pid)) { return 1 }
-		else { return ($! =~ m/^
-			Operation\s+not\s+permitted | #linux
-			Not\s+owner                   #solaris
-		$/mx) }
+		if (kill 0, $pid) { return 1 }
+		else              { return ($! =~ /$eperm_re/) };
 	};
 	$use_scalar_pexists = 0;
 	*_pexists = \&$pp_pexists; 
 }
-
-#last tested version list, ? = not yet tested
-# POSIX/UNIX-y OS's are tested both with and without cc
-# linuces: {gutsy/amd64|feisty/ppc}, {sarge/2.4/x86|etch/amd64}
-#              0.11        0.11          0.11           0.11
-# BSDs: FBSD4.11/x86, FBSD6.2/x86, obsd4.2/x86, netbsd4.0/x86
-#           0.11          0.11         0.11          0.11
-# misc: solaris10/x86/gcc, osX/ppc, osX/x86, mac OS 9
-#             0.11            ?       0.11      ?
-# win/cygwin/PP:   XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
-#                  0.11  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
-# win/cygwin:      XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
-#                  0.11  ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
-# win/strawbery/PP:XP32 XP64 vista vista64 w2k ws2k3
-#                  FAIL  ?     ?      ?     ?    ? 
-# win/strawberry:  XP32 XP64 vista vista64 w2k ws2k3
-#                  0.11  ?     ?      ?     ?    ? 
-# win/activestate: XP32 XP64 vista vista64 w2k nt4 ws2k3 wCE w95 w98 wme
-#                   ?    ?     ?      ?     ?   ?    ?    ?   ?   ?   ?    
-# others? does anyone run perl on VMS, BeOS, RISCOS, Netware3 ?
 
 sub pexists {
 	my @pids = @_; 
@@ -62,7 +57,7 @@ sub pexists {
 				warn "windows ignored the bottom 2 bits of the pid $pid, unexpected results may occur!";
 			}
 			if($ret) {
-				if($args{any}) { return 1; }
+				return 1 if($args{any}); 
 				push @results, $pid; 
 			} elsif($args{all}) {
 				return 0;
@@ -70,7 +65,7 @@ sub pexists {
 		}
 		return wantarray ? @results : scalar @results; 
 	} else {
-		return _scalar_pexists([@pids], $args{any} || 0, $args{all} || 0); 
+		return _scalar_pexists([@pids], $args{any} || 0, $args{all} || 0);
 	}
 }
 
@@ -117,28 +112,37 @@ the pid of the process to check and examining the result and errno.
 
 =head1 DEPENDENCIES
 
-	* a POSIX-y OS or win32
-	* Test::More if you want to run 'make test'
+ * any os with a POSIX layer or win32
+ * Test::More if you want to run 'make test'
 
 
 =head1 INCOMPATIBILITIES
 
-There is no pure perl implementation under Windows. However, with
-Strawberry Perl L<http://strawberryperl.com/>, this should be less
-of an issue.
+It's possible that if you don't have a C compiler, and you're
+running an "obscure" UNIX-y OS (read: not linux, *BSD, solaris,
+or Mac OS X), you might not pass make test. This is because in
+pure-perl mode, we rely on string representation of errno in C<$!>,
+which differs from OS to OS. If you find yourself on such a
+system, don't fret! First, find the PID of a process running as
+another user (in almost all cases, init will be running as root
+with PID 1). Then run: C<perl -le 'kill(0,PID);print $^O.": $!"'>
+(substituting your PID). You can use this string to patch your
+source by adding it to %eperm_strings circa line 20 of Exists.pm,
+and please tell me what you did at B<< <ski-cpan@allafrica.com> >>
+(making sure to include Proc::Exists in the subject line) so I can
+include your patch in the next release. If this procedure fails, please 
+send the output of misc/gather-info.pl to
+B<< <ski-cpan@allafrica.com> >> and I'll try to send you a patch
+as soon as I can. Again, be sure to put Proc::Exists in the subject 
+line. Note that a signal 0 sent by kill only indicates if a signal may 
+be sent, it does not actually send any signal, and so will not disrupt 
+any process.
+
+There is no pure perl implementation under Windows. The solution
+is to use Strawberry Perl L<http://strawberryperl.com/>.
 
 Any other OS without a POSIX emulation layer will probably be
 completely non-functional (unless it implements C<kill()>).
-
-It's possible that if you don't have a C compiler, and you're not
-running an obscure UNIX-y OS (read: not linux, *BSD, solaris, or
-Mac OS X), you might not pass make test. This is because in
-pure-perl mode, we rely on string representation of errno in C<$!>,
-which differs from OS to OS. If you find yourself on such a
-system, run C<perl -le 'kill 0, 1; print $!'> and please send me
-the output at B<< <ski-cpan@allafrica.com> >> with Proc::Exists
-in the subject line. Meanwhile you can patch your own source by
-adding your string to C<pp_pexists> in C<lib/Proc/Exists.pm>.
 
 
 =head1 BUGS AND LIMITATIONS
@@ -149,8 +153,8 @@ web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Brian Szymanski  B<< <ski-cpan@allafrica.com> >>
-
+Brian Szymanski  B<< <ski-cpan@allafrica.com> >> -- be sure to put 
+Proc::Exists in the subject line if you want me to read your message.
 
 =head1 LICENCE AND COPYRIGHT
 

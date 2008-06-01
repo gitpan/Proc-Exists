@@ -1,8 +1,9 @@
-Proc-Exists version 0.0.1
+Proc-Exists version 0.12
 
-This is a small module which quickly checks for process existence
-by using the /proc filesystem
-
+This is a small module which quickly checks for process existence via
+kill() or equivalent (on win32, OpenProcess(PROCESS_QUERY_INFORMATION...)
+relying on or incurring the performance overhead of using the /proc 
+filesystem.
 
 INSTALLATION
 
@@ -12,13 +13,6 @@ To install this module, run the following commands:
 	make
 	make test
 	make install
-
-Alternatively, to install with Module::Build, you can use the following commands:
-
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
 
 
 DEPENDENCIES

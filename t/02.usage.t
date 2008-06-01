@@ -20,6 +20,8 @@ if ($^O eq 'MSWin32') {
 	#http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
 	if(defined($ENV{OS})) {
 		if($ENV{OS} eq "Windows_NT") {
+			#FIXME: this is not a contract, but an observation about
+			#winnt behavior, and thus it's wrong to depend on it...
 			#apparently w95 pids were "regularly in the 4billion range"
 			#so let's hope... say... 99999*4 never matches
 			@pids_to_strobe = map { $_ * 4 } (0..19999);
@@ -73,16 +75,7 @@ ok(0 == pexists($$, $another_pid, $nonexistent_pid, {all => 1}));
 ok(scalar @t <  scalar @pids_to_strobe);
 #tests on scalar form follow...
 ok(pexists(@pids_to_strobe) < scalar @pids_to_strobe);
-#check shortcutting with "any" arg, again
+#check shortcutting with "any" arg
 ok(1 == pexists(@pids_to_strobe, {any => 1}));
 #make sure "all" arg works properly
 ok(0 == pexists(@pids_to_strobe, {all => 1}));
-#!perl
-$|++;
-use ExtUtils::MakeMaker;
-
-use Config qw(%Config); #for $Config{cc}
-
-# An existing makefile can confuse the CC test.
-unlink('Makefile');
-

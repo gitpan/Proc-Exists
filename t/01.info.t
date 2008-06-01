@@ -1,0 +1,15 @@
+use Test::More tests => 1;
+
+warn "WARNING: ignore all warnings from this test ;-)\n";
+require Config;
+my $archname = $Config::Config{archname}; 
+my $osvers = $Config::Config{osvers}; 
+warn "osname: $^O, archname: $archname, osvers: $osvers\n";
+for my $pid (0..10) {
+	my $out = kill 0, $pid;
+	warn "pid: $pid, out: $out, err: $!\n";
+}
+#TODO: emit a warning about perl -le 'kill 0, 1; print $!'
+#or perhaps just try it yoself?
+
+ok(1);

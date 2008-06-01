@@ -1,49 +1,57 @@
 Revision history for Proc-Exists
 
-0.11  17-May-2008 23:35 GMT
-		- win32 code made simpler AND faster, w00t.
-		- various hacks to make solaris10 work with a stubbed cc
-		  but a real gcc
+0.12  2008-05-01 01:35 GMT rev. 338
+      - fix an obvious, and critical bug in t/01.usage.t (raw omelette,
+        yum!), thanks ANDK
+      - various cleanups
+      - minor optimization for the pureperl case
+      - add t/01.info.t so we can glean some info about unusual OS's
+        i don't have access to from smokers.
 
-0.10  19-Feb-2008 07:27 GMT
+0.11  2008-05-17 23:35 GMT rev. ~321
+      - win32 code made simpler AND faster, w00t.
+      - various hacks to make solaris10 work with a stubbed cc
+        but a real gcc
+
+0.10  2008-02-19 07:27 GMT rev. ~299
       - compatibility with perl 5.5.x
       - add examples/pswait
 
-0.09  02-Feb-2008 08:31 GMT
+0.09  2008-02-02 08:31 GMT rev. ~290
       - nuttin but kwalitee and POD tweaks
 
-0.08  30-Jan-2008 07:07 GMT
+0.08  2008-01-30 07:07 GMT rev. ~282
       - more tests
       - optimized for the many processes case via _scalar_pexists()
       - tweak errno tests for possibly enhanced portability
       - commented out roadmap for Mac OS (< X) support
       - silence some warnings from cygwin/gcc
 
-0.07  22-Jan-2008 12:39 GMT
+0.07  2008-01-22 12:39 GMT rev. ~266
       - fix wrong LICENSE - this is perl, not gpl
 
-0.06  21-Jan-2008 18:28 GMT
+0.06  2008-01-21 18:28 GMT rev. ~263
       - POD updates and some other minor things.
       - fast, experimental (read: non-functioning) code in Exists.xs
         for win32. this release is mostly uploaded just to see if
         anyone has ideas about how to make that code work ;-)
 
-0.05  20-Jan-2008 11:41 GMT
+0.05  2008-01-20 11:41 GMT rev. ~247
       - Win32/XS support
       - Remove POD/PCritic tests from MANIFEST, distribution (still in svn)
       - Many Kwalitee, PCritic cleanups, including updating this file ;-)
       - Add benchmarking info in BENCHMARKS
       - Micro-mem-optimization - pp_pexists never lives in memory with XS
 
-0.04  19-Jan-2008 06:39 GMT
+0.04  2008-01-19 06:39 GMT rev. ?
       - Fix some failing tests due to Perl::Critic
 
-0.03  19-Jan-2008 03:13 GMT
+0.03  2008-01-19 03:13 GMT rev. ?
       - Fall back to pureperl when XS isunavailable
 
-0.02  18-Jan-2008 23:57 GMT
+0.02  2008-01-18 23:57 GMT rev. ?
       - Use kill via XS instead of using /proc
 
-0.01  18-Jan-2008 18:36 GMT
+0.01  2008-01-18 18:36 GMT rev. ~207
       - Initial release.
 
