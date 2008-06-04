@@ -66,7 +66,19 @@ _pexists(pid)
 		//existent process w/ perms:  ret: 0
 		//existent process w/o perms: ret: -1, err: EPERM
 		//nonexistent process:        ret: -1, err: ESRCH
-		RETVAL = (ret==0) ? 1 : (errno!=ESRCH);
+		if(ret == 0) {
+			RETVAL = 1;
+		} else if(ret == -1) {
+			if(errno == EPERM) {
+				RETVAL = 1;
+			} else if(errno == ESRCH) {
+				RETVAL = 0;
+			} else {
+				croak("unknown errno: %d", errno);
+			}
+		} else {
+			croak("kill returned something other than 0 or -1: %d", ret);
+		}
 #endif
 	OUTPUT:
 		RETVAL

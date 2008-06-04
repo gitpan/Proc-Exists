@@ -1,5 +1,6 @@
 BENCHMARKS
 Changes
+Exists/Configuration.pm
 Exists.pm
 Exists.xs
 MANIFEST

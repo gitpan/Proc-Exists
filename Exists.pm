@@ -1,14 +1,15 @@
 package Proc::Exists;
 
-BEGIN { eval { require warnings; }; }; #it's ok if we can't load warnings
+#use warnings; #it's ok if we can't load warnings, but the author should
 use strict;
+use Proc::Exists::Configuration;
 use vars qw (@ISA @EXPORT_OK $VERSION); 
 
 require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 my $use_scalar_pexists = ($^O ne 'MSWin32');
 
@@ -17,27 +18,23 @@ eval {
 	XSLoader::load('Proc::Exists', $VERSION); 
 }; if($@) {
 	#warn "using pure perl mode, expect degraded performance\n";
-	my %eperm_strings = ( solaris => 'Not\s+owner' );
-	for my $os ( qw (linux freebsd openbsd netbsd darwin cygwin) ) {
-		$eperm_strings{$os} = 'Operation\s+not\s+permitted';
-	}
-	my $eperm_str = $eperm_strings{$^O};
-	#the linux-y case is more common... here's hoping...
-	if(!defined($eperm_str)) {
-		require Config;
-		my $archname = $Config::Config{archname}; 
-		my $osvers = $Config::Config{osvers}; 
-		$eperm_str = 'Operation\s+not\s+permitted';
-		warn "unknown OS in pureperl mode, you may encounter unexpected results!\n";
-		warn "please follow the instructions in the INCOMPATIBILITIES section of the perldoc\n";
-		warn "osname: $^O\narchname: $archname\nosvers: $osvers\n"; 
-	}
-	my $eperm_re = qr/^\s*$eperm_str\s*$/; 
-
+	my $EPERM = $Proc::Exists::Configuration::EPERM; 
+	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
 	my $pp_pexists = sub {
 		my $pid = shift;
-		if (kill 0, $pid) { return 1 }
-		else              { return ($! =~ /$eperm_re/) };
+		if (kill 0, $pid) {
+			return 1;
+		} else {
+			if($! == $EPERM) {
+				return 1;
+			} elsif($! == $ESRCH) {
+				return 0;
+			} elsif($^O eq "MSWin32") {
+				die "can't do pure perl on MSWin32 - \$!: (".(0+$!)."): $!"; 
+			} else {
+				die "unknown numeric \$!: (".(0+$!)."): $!, pureperl, OS: $^O"; 
+			}
+		}
 	};
 	$use_scalar_pexists = 0;
 	*_pexists = \&$pp_pexists; 
@@ -120,23 +117,24 @@ the pid of the process to check and examining the result and errno.
 
 It's possible that if you don't have a C compiler, and you're
 running an "obscure" UNIX-y OS (read: not linux, *BSD, solaris,
-or Mac OS X), you might not pass make test. This is because in
-pure-perl mode, we rely on string representation of errno in C<$!>,
-which differs from OS to OS. If you find yourself on such a
-system, don't fret! First, find the PID of a process running as
-another user (in almost all cases, init will be running as root
-with PID 1). Then run: C<perl -le 'kill(0,PID);print $^O.": $!"'>
-(substituting your PID). You can use this string to patch your
-source by adding it to %eperm_strings circa line 20 of Exists.pm,
-and please tell me what you did at B<< <ski-cpan@allafrica.com> >>
-(making sure to include Proc::Exists in the subject line) so I can
-include your patch in the next release. If this procedure fails, please 
-send the output of misc/gather-info.pl to
-B<< <ski-cpan@allafrica.com> >> and I'll try to send you a patch
-as soon as I can. Again, be sure to put Proc::Exists in the subject 
-line. Note that a signal 0 sent by kill only indicates if a signal may 
-be sent, it does not actually send any signal, and so will not disrupt 
-any process.
+or Mac OS X), you might not pass make test. This is because we need
+to compare the value of $! after a call to kill() with EPERM
+and ESRCH. Not wanting to rely on POSIX, we determine EPERM 
+and ESRCH at build (Makefile.PL) time, by using POSIX if it exists
+-- but using the common values of EPERM==1 and ESRCH==3 if we can't 
+load POSIX. If you find yourself on such a system, your best bet is to 
+look up EPERM and ESRCH (try grepping for them down /usr/include or 
+wherever your headers are kept). If you get hits back, you can edit 
+Exists/Configuration.pm and add your values there, and re-run the build 
+process. Whether you were successful or not, please send a description
+of what you tried, as well as the output of perl -V and the results of 
+perl misc/gather-info.pl to B<< <ski-cpan@allafrica.com> >> - making
+sure to include Proc::Exists in the subject line (or else I won't read 
+it!) If you had no success, hopefully I'll be able to provide a patch 
+for you, and a fix/workaround for the next release of Proc::Exists. By 
+the way, don't be afraid that we send signal 0 to your processes - kill 
+with signal 0 only indicates if a signal may be sent, it does not 
+actually send any signal, and so will not disrupt any process.
 
 There is no pure perl implementation under Windows. The solution
 is to use Strawberry Perl L<http://strawberryperl.com/>.

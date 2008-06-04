@@ -1,57 +1,74 @@
 Revision history for Proc-Exists
 
-0.12  2008-05-01 01:35 GMT rev. 338
-      - fix an obvious, and critical bug in t/01.usage.t (raw omelette,
-        yum!), thanks ANDK
-      - various cleanups
-      - minor optimization for the pureperl case
-      - add t/01.info.t so we can glean some info about unusual OS's
-        i don't have access to from smokers.
+0.13  2008-06-04 10:19 GMT  rev. 359
+   - for speed, i18n, portability, and simplicity, pp_pexists now uses
+     the numeric (not string) value of $! - in particular this fixes the
+     pure perl implementation with non-english locales:
+       http://www.nntp.perl.org/group/perl.cpan.testers/2008/06/msg1569666.html
+       http://www.nntp.perl.org/group/perl.cpan.testers/2008/06/msg1578246.html
+   - better handling of unexpected conditions in both perl and xs 
+   - add misc/gather-info.pl for better portability data gathering
+   - Proc::Exists::Configuration maintains EPERM and ESRCH values
+     so we needn't rely on POSIX. Makefile.PL uses POSIX only if
+     it's available at build time to determine these constants,
+     otherwise we use the common EPERM==1, ESRCH==3
+   - POD updated.
+   - bring PREREQ_PM in line with reality, even for "trivial" modules
+   - solaris10/gcc hacks are no longer triggered on all gnu systems
+   - fix typo in Changes file: 0.12 was released in June, not May
 
-0.11  2008-05-17 23:35 GMT rev. ~321
-      - win32 code made simpler AND faster, w00t.
-      - various hacks to make solaris10 work with a stubbed cc
-        but a real gcc
+0.12  2008-06-01 01:35 GMT  rev. 338
+   - fix an obvious, and critical bug in t/01.usage.t (raw omelette,
+     yum!), thanks ANDK
+   - various cleanups
+   - minor optimization for the pureperl case
+   - add t/01.info.t so we can glean some info about unusual OS's
+     i don't have access to from smokers.
 
-0.10  2008-02-19 07:27 GMT rev. ~299
-      - compatibility with perl 5.5.x
-      - add examples/pswait
+0.11  2008-05-17 23:35 GMT  rev. ~321
+   - win32 code made simpler AND faster, w00t.
+   - various hacks to make solaris10 work with a stubbed cc
+     but a real gcc
 
-0.09  2008-02-02 08:31 GMT rev. ~290
-      - nuttin but kwalitee and POD tweaks
+0.10  2008-02-19 07:27 GMT  rev. ~299
+   - compatibility with perl 5.5.x
+   - add examples/pswait
 
-0.08  2008-01-30 07:07 GMT rev. ~282
-      - more tests
-      - optimized for the many processes case via _scalar_pexists()
-      - tweak errno tests for possibly enhanced portability
-      - commented out roadmap for Mac OS (< X) support
-      - silence some warnings from cygwin/gcc
+0.09  2008-02-02 08:31 GMT  rev. ~290
+   - nuttin but kwalitee and POD tweaks
 
-0.07  2008-01-22 12:39 GMT rev. ~266
-      - fix wrong LICENSE - this is perl, not gpl
+0.08  2008-01-30 07:07 GMT  rev. ~282
+   - more tests
+   - optimized for the many processes case via _scalar_pexists()
+   - tweak errno tests for possibly enhanced portability
+   - commented out roadmap for Mac OS (< X) support
+   - silence some warnings from cygwin/gcc
 
-0.06  2008-01-21 18:28 GMT rev. ~263
-      - POD updates and some other minor things.
-      - fast, experimental (read: non-functioning) code in Exists.xs
-        for win32. this release is mostly uploaded just to see if
-        anyone has ideas about how to make that code work ;-)
+0.07  2008-01-22 12:39 GMT  rev. ~266
+   - fix wrong LICENSE - this is perl, not gpl
 
-0.05  2008-01-20 11:41 GMT rev. ~247
-      - Win32/XS support
-      - Remove POD/PCritic tests from MANIFEST, distribution (still in svn)
-      - Many Kwalitee, PCritic cleanups, including updating this file ;-)
-      - Add benchmarking info in BENCHMARKS
-      - Micro-mem-optimization - pp_pexists never lives in memory with XS
+0.06  2008-01-21 18:28 GMT  rev. ~263
+   - POD updates and some other minor things.
+   - fast, experimental (read: non-functioning) code in Exists.xs
+     for win32. this release is mostly uploaded just to see if
+     anyone has ideas about how to make that code work ;-)
 
-0.04  2008-01-19 06:39 GMT rev. ?
-      - Fix some failing tests due to Perl::Critic
+0.05  2008-01-20 11:41 GMT  rev. ~247
+   - Win32/XS support
+   - Remove POD/PCritic tests from MANIFEST, distribution (still in svn)
+   - Many Kwalitee, PCritic cleanups, including updating this file ;-)
+   - Add benchmarking info in BENCHMARKS
+   - Micro-mem-optimization - pp_pexists never lives in memory with XS
 
-0.03  2008-01-19 03:13 GMT rev. ?
-      - Fall back to pureperl when XS isunavailable
+0.04  2008-01-19 06:39 GMT  rev. ?
+   - Fix some failing tests due to Perl::Critic
 
-0.02  2008-01-18 23:57 GMT rev. ?
-      - Use kill via XS instead of using /proc
+0.03  2008-01-19 03:13 GMT  rev. ?
+   - Fall back to pureperl when XS isunavailable
 
-0.01  2008-01-18 18:36 GMT rev. ~207
-      - Initial release.
+0.02  2008-01-18 23:57 GMT  rev. ?
+   - Use kill via XS instead of using /proc
+
+0.01  2008-01-18 18:36 GMT  rev. ~207
+   - Initial release.
 

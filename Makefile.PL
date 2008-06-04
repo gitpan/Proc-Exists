@@ -1,8 +1,8 @@
 #!perl
 $|++;
 use ExtUtils::MakeMaker;
-
-use Config qw(%Config); #for $Config{cc}
+use Cwd;
+use Config qw(%Config); #for $Config{cc} 
 
 # An existing makefile can confuse the CC test.
 unlink('Makefile');
@@ -23,12 +23,60 @@ if ($^O eq 'MSWin32') {
 	}
 }
 
+### if we can use POSIX, find out what EPERM and ESRCH are.
+### if they aren't 1 and 3 (which seems standard), then clobber
+### Exists/Configuration.pm with the new values. this is done
+### here to avoid a dependency on POSIX, since we almost never
+### need it. yes, this is ugly.
+BEGIN {
+	$::using_POSIX = 0;
+	eval {
+		require POSIX;
+	}; if(!$@) {
+		import POSIX qw(:errno_h);
+		$::using_POSIX = 1;
+	}
+};
+if($::using_POSIX) {
+	my $EPERM = eval('EPERM');
+	my $ESRCH = eval('ESRCH');
+	my $wd = getcwd;
+	chdir "Exists";
+	open(CONF, "<Configuration.pm");
+	my @lines = map { chomp; $_  } <CONF>; 
+	close(CONF);
+	my @t = grep(/./, map { /^\s*\$ESRCH = (\d+)\s*;\s*$/; $1 } @lines); 
+	die "Configuration.pm in a weird state, not the right number of ESRCH's\n... if you are confused, restore Exists/Configuration.pm from the distribution\n" if(@t != 1);
+	my $OLD_ESRCH = $t[0]; 
+	@t    = grep(/./, map { /^\s*\$EPERM = (\d+)\s*;\s*$/; $1 } @lines); 
+	die "Configuration.pm in a weird state, not the right number of EPERM's\n... if you are confused, restore Exists/Configuration.pm from the distribution\n" if(@t != 1);
+	my $OLD_EPERM = $t[0]; 
+	if($EPERM != $OLD_EPERM or $ESRCH != $OLD_ESRCH) {
+		warn "updating Configuration.pm EPERM: $OLD_EPERM => $EPERM, ESRCH: $OLD_ESRCH => $ESRCH on $^O\n"; 
+		foreach my $ln (0..$#lines) {
+			$lines[$ln] =~ s/^\s*\$EPERM = \d+\s*;\s*$/\$EPERM = $EPERM;/; 
+			$lines[$ln] =~ s/^\s*\$ESRCH = \d+\s*;\s*$/\$ESRCH = $ESRCH;/; 
+		}
+		open(CONF, ">Configuration.pm");
+		print CONF "$_\n" foreach @lines; 
+		close(CONF);
+	}
+	chdir($wd); 
+}
+
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 my %Makefile = (
 	NAME              => 'Proc::Exists',
 	VERSION_FROM      => 'Exists.pm', # finds $VERSION 
-	PREREQ_PM         => { 'Test::More' => 0, },
+	PREREQ_PM         => {
+	                       'Cwd'                 => 0,
+	                       'Config'              => 0,
+	                       'Exporter'            => 0,
+	                       'ExtUtils::MakeMaker' => 0,
+	                       'Test::More'          => 0, 
+                        },
 	($] >= 5.005 ?     ## Add these new keywords supported since 5.005
 		(ABSTRACT_FROM => 'Exists.pm', # retrieve abstract from module
 		 AUTHOR        => 'Brian Szymanski <ski-cpan@allafrica.com>') : ()),
@@ -57,9 +105,9 @@ my $do_hacks;
 my $err = use_pure_perl();
 $Makefile{CC} = $CC; 
 #don't try to link via a non-existent cc
-if(($CC ne $Config{cc}) && ($Config{ld} eq $Config{cc})) {
+if($CC && ($^O eq "solaris") && ($CC ne $Config{cc}) && ($Config{ld} eq $Config{cc})) {
 	$Makefile{LD} = $CC; 
-	#FIXME: there are other ways we could get here...
+	#FIXME: are there other ways we could get here?
 	$do_hacks = "solaris10_gcc";
 }
 

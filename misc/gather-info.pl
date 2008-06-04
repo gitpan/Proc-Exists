@@ -1,6 +1,7 @@
 #!perl
 
-use strict; use warnings;
+#use warnings; #it's ok if we can't load warnings, but the author should
+use strict;
 
 my @tests = (
 	{ msg => "nonexistent process" },
@@ -18,12 +19,14 @@ foreach my $test (@tests) {
 	$pid = $$ if($pid eq '' && $test->{xtra});
 	my $ret = kill(0, $pid);
 	$test->{err} = $!; 
+	$test->{errno} = 0+$!; 
 	$test->{ret} = $ret; 
 }
 
 print "\n\n=== results ===\nOS: $^O\n"; 
 foreach my $test (@tests) {
-	my ($m, $ret, $err) = ($test->{msg}, $test->{ret}, $test->{err});
-	print "$m test got ret: $ret, \$!: $err\n";
+	my ($m, $ret, $err, $errno) =
+     ($test->{msg}, $test->{ret}, $test->{err},  $test->{errno});
+	print "$m test got ret: $ret, \$!: $errno ($err)\n";
 }
 
