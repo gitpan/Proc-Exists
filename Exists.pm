@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 my $use_scalar_pexists = ($^O ne 'MSWin32');
 

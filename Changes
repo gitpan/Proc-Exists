@@ -1,5 +1,8 @@
 Revision history for Proc-Exists
 
+0.15  2008-06-21 09:53 GMT  rev. 380
+   - fix XS on perl 5.5.x
+
 0.14  2008-06-21 08:32 GMT  rev. 378
    - catch unexpected return / errno values in _scalar_pexists
    - try cc before alternatives. add pcc and lcc to possible alternatives

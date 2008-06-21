@@ -64,10 +64,10 @@ _pexists(pid)
 		// possible returns: -2 = err, no : -1 = err, yes : 0 = no : 1 = yes
 		if(dowarn) { RETVAL -= 2; };
 #else
-		if (pid < 0) {
-			croak("got non-integer pid");
-		}
-		int ret = kill(pid, 0);
+		int ret;
+
+		if (pid < 0) { croak("got non-integer pid"); }
+		ret = kill(pid, 0);
 		//existent process w/ perms:  ret: 0
 		//existent process w/o perms: ret: -1, err: EPERM
 		//nonexistent process:        ret: -1, err: ESRCH
