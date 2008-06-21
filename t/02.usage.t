@@ -1,5 +1,7 @@
 use Test::More 'no_plan';
 
+use lib "blib/lib";  #pm
+use lib "blib/arch"; #xs
 use Proc::Exists qw(pexists);
 
 my @pids_to_strobe = (1..99999);
@@ -40,6 +42,24 @@ if ($^O eq 'MSWin32') {
 		$another_pid = 1; #gulp, hopefully there is something init-esque w/ pid 1?
 	}
 }
+
+#a negative pid should give an error: "got non-integer pid"
+eval { pexists('-2'); };
+ok($@ && $@ =~ /^got non-integer pid/);
+eval { pexists('-2', 3); };
+ok($@);
+#force call to full _pexists, not _scalar_pexists
+eval { my @x = pexists('-2', 3); };
+ok($@);
+
+#a non-integer pid should give an error: "got non-integer pid"
+eval { pexists('abc'); };
+ok($@ && $@ =~ /^got non-integer pid/);
+eval { pexists('abc', 3); };
+ok($@);
+#force call to full _pexists, not _scalar_pexists
+eval { my @x = pexists('abc', 3); };
+ok($@);
 
 #make sure this process exists
 ok(pexists($$));

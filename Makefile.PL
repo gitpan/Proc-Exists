@@ -4,6 +4,14 @@ use ExtUtils::MakeMaker;
 use Cwd;
 use Config qw(%Config); #for $Config{cc} 
 
+my $force_pp = undef;
+if( scalar @ARGV ) {
+	my $pp_arg = (grep /\-+(pureperl|pp|xs)/i, @ARGV)[0]; 
+	my $pp = ($pp_arg =~ /pureperl|pp/);
+	$pp = !$pp if($pp_arg =~ /no/);
+	$force_pp ||= ($pp ? "yes" : "no");
+}
+
 # An existing makefile can confuse the CC test.
 unlink('Makefile');
 
@@ -64,7 +72,6 @@ if($::using_POSIX) {
 	chdir($wd); 
 }
 
-
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 my %Makefile = (
@@ -99,28 +106,48 @@ my %Makefile = (
 
 );
 
-#determine what C compiler to use, if any
-my $CC; 
-my $do_hacks;
-my $err = use_pure_perl();
-$Makefile{CC} = $CC; 
-#don't try to link via a non-existent cc
-if($CC && ($^O eq "solaris") && ($CC ne $Config{cc}) && ($Config{ld} eq $Config{cc})) {
-	$Makefile{LD} = $CC; 
-	#FIXME: are there other ways we could get here?
-	$do_hacks = "solaris10_gcc";
+# ask if you want to use XS or pureperl (default=XS)
+#TODO: bold this if possible?
+if(!defined($force_pp)) {
+	print <<END;
+It is recommended to use the XS code, which is faster, and compatible 
+with strawberry perl. You should only use the pureperl option if you 
+are on a POSIX system *without* a functional c compiler, or you have
+trouble with the XS option.
+
+END
+	$force_pp = prompt("Do you want to forego XS for the pureperl implementation (y/n)?", "no");
 }
 
-if($err) {
-	print "NO:\n   $err\n"; 
-	print <<END;
-I cannot detect a working C compiler. I will install the 
-perl-only implementation. Expect degraded performance.
-END
+#determine what C compiler to use, if any
+my $CC; 
+my $do_hacks; 
+my $use_pp; 
+
+if($force_pp =~ /^y/i) {
+	$use_pp = "user requested pureperl";
+} else {
+	$use_pp = use_pure_perl();
+	$Makefile{CC} = $CC; 
+	#don't try to link via a non-existent cc
+	if($CC && ($^O eq "solaris") && ($CC ne $Config{cc}) && ($Config{ld} eq $Config{cc})) {
+		$Makefile{LD} = $CC; 
+		#FIXME: are there other ways we could get here?
+		$do_hacks = "solaris10_gcc";
+	}
+	if($use_pp) {
+		print "NO:\n   $use_pp\n"; 
+		print "I cannot detect a working C compiler. I will install the ".
+		print "perl-only implementation. Expect degraded performance.\n";
+	} else {
+		print "YES\n";
+	}
+}
+
+if($use_pp) {
 	delete $Makefile{CC}; 
 	delete $Makefile{LD}; 
 } else {
-	print "YES\n";
 	delete $Makefile{XS}; 
 	delete $Makefile{C}; 
 }
@@ -145,7 +172,7 @@ EOF
 
 	#sometimes $Config{CC} is not the answer (e.g. solaris10 w/ gcc but
 	#no cc package installed)...
-	my @cc_alternatives = qw ( gcc cc egcs );
+	my @cc_alternatives = qw ( cc gcc egcs pcc lcc );
 	my $ret;
 	foreach my $cc ( $Config{cc}, @cc_alternatives )  {
 		print "trying $cc... "; 

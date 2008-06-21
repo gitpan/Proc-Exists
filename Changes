@@ -1,5 +1,14 @@
 Revision history for Proc-Exists
 
+0.14  2008-06-21 08:32 GMT  rev. 378
+   - catch unexpected return / errno values in _scalar_pexists
+   - try cc before alternatives. add pcc and lcc to possible alternatives
+   - Makefile.Pl supports --xs and --pureperl arguments, prompts
+     with informative text if not given one (default XS)
+   - improve error handling with invalid PIDs (strings, ints < 0)
+   - fix problem with test suite where installed XS was used in place
+     of the version in blib/
+
 0.13  2008-06-04 10:19 GMT  rev. 359
    - for speed, i18n, portability, and simplicity, pp_pexists now uses
      the numeric (not string) value of $! - in particular this fixes the

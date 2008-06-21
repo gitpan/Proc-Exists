@@ -1,3 +1,16 @@
+testing on POSIX systems:
+  perl Makefile.PL -xs ; make distclean ; perl Makefile.PL -xs ;
+    make && make test >xs.test.out 2>&1
+  perl Makefile.PL -pureperl ; make distclean ; perl Makefile.PL -pureperl ;
+    make && make test >pp.test.out 2>&1
+  echo === XS make test output ===
+  cat xs.test.out
+  echo === PP make test output ===
+  cat pp.test.out
+  echo XS: `grep Result xs.test.out`
+  echo PP: `grep Result pp.test.out`
+  rm -f xs.test.out pp.test.out
+
 ## last tested version list, ? = not yet tested
 ## POSIX/UNIX-y OS's are tested both with and without cc
 ## most tested like so: perl Makefile.PL ; make distclean ; perl Makefile.PL && make && make test ; echo -n "w/ cc tests above (hit enter)..." ; read X ; make distclean ; sudo mv /usr/bin/cc /usr/bin/gcc ~/ ;  perl Makefile.PL && make && make test ; echo those were tests w/o cc ; sudo mv ~/cc ~/gcc /usr/bin/
@@ -17,9 +30,23 @@ winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:            0.13
 winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:             0.13
 winXP32/SP2/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:        0.13
 winXP32/SP2/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:         FAIL
+
 --- platforms tested via cpants ---
-osx/ppc:                  0.11 #http://www.nntp.perl.org/group/perl.cpan.testers/2008/05/msg1553172.html
-other untested OS's:
-win:   vista32, vista64, w2k, nt4, ws2k3, wME, w98, w95, activestate
-other: VMS, BeOS, RISCOS, Netware3 ?
+http://www.nntp.perl.org/group/perl.cpan.testers/$test_id
+platform        | version |   perl versions     | test_id(s)
+freebsd6.1/x86  |  0.13   | 5.10.0,5.6.2,5.5.5  | 1738784,1727352,1727263
+freebsd7.0/x86  |  0.13   | 5.10.0,5.11.0       | 1641915,1638524
+irix6.5/mips    |  0.13   | 5.8.8               | 1610056
+linux2.6/x86    |  0.13   | 5.6.2,5.10.0,5.11.0 | 1736939,1710302,1706516
+openbsd4.1/x86  |  0.13   | 5.11.0              | 1667882 
+osx/ppc         |  0.13   | 5.6.2,5.8.8,5.10.0  | 1603341,1603349,1603336
+netbsd2.1/alpha |  0.13   | 5.10.0              | 1610123
+netbsd3.1/x86   |  0.13   | 5.6.2,5.8.x,5.10.0  | 1604170,1604221,1604165
+netbsd4.0/x86   |  0.13   | 5.10.0              | 1638524
+solaris9/sparc  |  0.13   | 5.10.0              | 1610143
+TODO: fill in pre-0.13 reports?
+
+--- untested platforms ---
+win:   vista? 64-bit windows? non-NT windows: winME, w98, w95? activestate?
+other: macOS<10, VMS, BeOS, RISCOS, Netware3, etc.
 

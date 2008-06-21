@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 my $use_scalar_pexists = ($^O ne 'MSWin32');
 
@@ -21,7 +21,7 @@ eval {
 	my $EPERM = $Proc::Exists::Configuration::EPERM; 
 	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
 	my $pp_pexists = sub {
-		my $pid = shift;
+		my $pid = $_[0]; 
 		if (kill 0, $pid) {
 			return 1;
 		} else {
@@ -47,6 +47,7 @@ sub pexists {
 	my @results; 
 	if(wantarray || !$use_scalar_pexists) {
 		foreach my $pid (@pids) {
+			die "got non-integer pid: $pid" if($pid !~ /^\d+$/); 
 			my $ret = _pexists($pid); 
 			if($ret < 0) {
 				$ret += 2;
