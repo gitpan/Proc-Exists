@@ -1,5 +1,16 @@
 Revision history for Proc-Exists
 
+0.90  2008-06-23 08:52 GMT  rev. 409
+   - API change: pexists(... {any=>1}) returns pid of process found
+   - API now frozen until 1.00
+   - don't muck with return value on win32 - just warn in place
+   - xs and pp give same error message with non-int PIDs now.
+   - implement _list_pexists in XS for extra speed, minimizing the
+     perl "wrapping" around raw XS in this case
+   - clean up lots of duplication in XS via static inline __pexists in
+     pexists.h
+   - _scalar_pexists now works for win32
+
 0.15  2008-06-21 09:53 GMT  rev. 380
    - fix XS on perl 5.5.x
 

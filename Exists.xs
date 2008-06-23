@@ -22,6 +22,7 @@
 ////with a good ifdef, compare GetProcessInformation from Mac::Processes
 
 #include "ppport.h"
+#include "pexists.h"
 
 #define RETVAL_IS_UNSET -999
 
@@ -29,68 +30,13 @@ MODULE = Proc::Exists		PACKAGE = Proc::Exists
 
 PROTOTYPES: DISABLE
 
-#returns 1 if the process exists, 0 if it doesn't
-#return RETVAL_IS_UNSET if a fatal error occured
-#on win32/NT, can also return -2 or -1 if the pid was not a multiple of 4
-#in which case the pure perl code emits a warning and converts the 
-#return value into an interpretable one (more below)
-int
-_pexists(pid)
-		int pid
-	CODE:
-#ifdef WIN32
-		// this is much faster than iterating over a process snapshot,
-		// and more closely mirrors the POSIX code, but it has a weirdness
-		// on NTish systems - namely if these exists a pid 4, pid's 5, 6,
-		// and 7 will also return true. something in the windows guts is
-		// chopping off the bottom two bits, see:
-		// http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
-		HANDLE hProcess;
-		PROCESSENTRY32 pe32;
-		DWORD err;
-		int dowarn;
+### static int _pexists() from pexists.h behaves as follows:
+# returns 1 if the process exists, 0 if it doesn't
+# on win32/NT, can also return -2 or -1 if the pid was not a multiple of 4
+# in which case the pure perl code emits a warning and adds 2 to get
+# the expected 0 or 1 value, as appropriate
 
-		dowarn=0; // XS, arg.
-#ifdef win32_pids_mult4
-		if(pid % 4) { dowarn = 1; };
-#endif
-		hProcess = OpenProcess( PROCESS_QUERY_INFORMATION, FALSE, pid );
-		if(hProcess == NULL) { 
-			RETVAL = 0;
-		} else {
-			RETVAL = 1;
-			CloseHandle( hProcess );
-		}
-		// possible returns: -2 = err, no : -1 = err, yes : 0 = no : 1 = yes
-		if(dowarn) { RETVAL -= 2; };
-#else
-		int ret;
-
-		if (pid < 0) { croak("got non-integer pid"); }
-		ret = kill(pid, 0);
-		//existent process w/ perms:  ret: 0
-		//existent process w/o perms: ret: -1, err: EPERM
-		//nonexistent process:        ret: -1, err: ESRCH
-		if(ret == 0) {
-			RETVAL = 1;
-		} else if(ret == -1) {
-			if(errno == EPERM) {
-				RETVAL = 1;
-			} else if(errno == ESRCH) {
-				RETVAL = 0;
-			} else {
-				croak("unknown errno: %d", errno);
-			}
-		} else {
-			croak("kill returned something other than 0 or -1: %d", ret);
-		}
-#endif
-	OUTPUT:
-		RETVAL
-
-
-
-#a faster implementation for non-win32, non-wantarray case
+# XS implementation for scalar context
 int
 _scalar_pexists(pids_ref, any, all)
 		SV *pids_ref
@@ -104,7 +50,7 @@ _scalar_pexists(pids_ref, any, all)
 		int exists;
 		int total=0;
 		int pid;
-		int ret;
+//warn("inXS: _scalar_pexists");
 
 		//make sure pids_ref is a ref pointing at an array with some elements
 		//GRR, no error when I typo avlen for av_len? grumble XS grumble...
@@ -119,32 +65,16 @@ _scalar_pexists(pids_ref, any, all)
 			pid_sv = *av_fetch(pids, i, 0);
 			//verify pid is an integer... or else "abc" becomes (int)(0)
 			if (!SvIOKp(pid_sv)) {
-				croak("got non-integer pid");
+				croak("got non-integer pid: %s", SvPV_nolen(pid_sv));
 			}
 			pid = SvIV(pid_sv);
-			if (pid < 0) {
-				croak("got non-integer pid");
-			}
-			ret = kill(pid, 0);
-			//existent process w/ perms:  ret: 0
-			//existent process w/o perms: ret: -1, err: EPERM
-			//nonexistent process:        ret: -1, err: ESRCH
-			if(ret == 0) {
-				exists = 1;
-			} else if(ret == -1) {
-				if(errno == EPERM) {
-					exists = 1;
-				} else if(errno == ESRCH) {
-					exists = 0;
-				} else {
-					croak("unknown errno: %d", errno);
-				}
-			} else {
-				croak("kill returned something other than 0 or -1: %d", ret);
-			}
 
-			if( (any && exists) || (all && !exists) ) {
-				RETVAL = exists; break;
+			exists = __pexists(pid);
+
+			if( any && exists) {
+				RETVAL = pid; break;
+			} else if( all && !exists ) {
+				RETVAL = 0; break;
 			} else {
 				total+=exists;
 			}
@@ -152,4 +82,44 @@ _scalar_pexists(pids_ref, any, all)
 		if(RETVAL==RETVAL_IS_UNSET) { RETVAL = total; };
 	OUTPUT:
 		RETVAL
+
+### TODO: _list_pexists and _scalar_pexists are still VERY similar...
+### must be some way to unify them further?
+# XS implementation for list context
+void
+_list_pexists(pids_ref)
+		SV *pids_ref
+	INIT:
+		AV *pids;
+		SV *pid_sv;
+		int npids;
+		int i;
+		int exists;
+		int pid;
+//warn("inXS: _list_pexists");
+
+		//make sure pids_ref is a ref pointing at an array with some elements
+		//GRR, no error when I typo avlen for av_len? grumble XS grumble...
+		if ((!SvROK(pids_ref)) || (SvTYPE(SvRV(pids_ref)) != SVt_PVAV) || 
+			 ((npids = av_len((AV *)SvRV(pids_ref))) < 0)) {
+			XSRETURN_UNDEF;
+		}
+		pids = (AV *)SvRV(pids_ref);
+	PPCODE:
+		for(i=0; i<=npids; i++) {
+			pid_sv = *av_fetch(pids, i, 0);
+			//verify pid is an integer... or else "abc" becomes (int)(0)
+			if (!SvIOKp(pid_sv)) {
+				croak("got non-integer pid: %s", SvPV_nolen(pid_sv));
+			}
+			pid = SvIV(pid_sv);
+
+			exists = __pexists(pid);
+
+			if(exists) {
+				mXPUSHi(pid);
+				//XPUSHs(sv_2mortal(newSViv(pid))); //needed for old perls?
+			};
+		}
+
 

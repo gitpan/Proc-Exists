@@ -48,7 +48,7 @@ eval { pexists('-2'); };
 ok($@ && $@ =~ /^got non-integer pid/);
 eval { pexists('-2', 3); };
 ok($@);
-#force call to full _pexists, not _scalar_pexists
+#force call to _list_pexists, not _scalar_pexists
 eval { my @x = pexists('-2', 3); };
 ok($@);
 
@@ -57,7 +57,7 @@ eval { pexists('abc'); };
 ok($@ && $@ =~ /^got non-integer pid/);
 eval { pexists('abc', 3); };
 ok($@);
-#force call to full _pexists, not _scalar_pexists
+#force call to _list_pexists, not _scalar_pexists
 eval { my @x = pexists('abc', 3); };
 ok($@);
 
@@ -72,7 +72,7 @@ ok(@t == 2);
 ok($t[0] == $another_pid);
 ok($t[1] == $$);
 #check return values from "any" and "all" args
-ok(1 == pexists($another_pid, $$, {any => 1}));
+ok($another_pid == pexists($another_pid, $$, {any => 1}));
 ok(2 == pexists($another_pid, $$, {all => 1}));
 
 #three-way tests - 2 exist, 1 doesn't, test any and all and plain
@@ -81,7 +81,7 @@ ok(2 == pexists($$, $another_pid, $nonexistent_pid));
 ok(@t == 2);
 ok($t[0] == $$);
 ok($t[1] == $another_pid);
-ok(1 == pexists($$, $another_pid, $nonexistent_pid, {any => 1}));
+ok($$ == pexists($$, $another_pid, $nonexistent_pid, {any => 1}));
 ok(0 == pexists($$, $another_pid, $nonexistent_pid, {all => 1}));
 
 #TODO: these tests are non-deterministic, unless our range a) covers
@@ -95,7 +95,5 @@ ok(0 == pexists($$, $another_pid, $nonexistent_pid, {all => 1}));
 ok(scalar @t <  scalar @pids_to_strobe);
 #tests on scalar form follow...
 ok(pexists(@pids_to_strobe) < scalar @pids_to_strobe);
-#check shortcutting with "any" arg
-ok(1 == pexists(@pids_to_strobe, {any => 1}));
 #make sure "all" arg works properly
 ok(0 == pexists(@pids_to_strobe, {all => 1}));

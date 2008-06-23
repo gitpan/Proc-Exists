@@ -1,0 +1,40 @@
+"always return undef, not 0, for false" audit
+
+make a distinct error message for negative integers from string pids,
+test what happens if passed a float, a ref, etc. and make distinct
+errors as necessary for them.
+
+also a Makefile.PL option and prompt for selecting a specific CC, 
+shortcutting the auto-detect code, same as done for xs/pp
+
+-- release 0.91 --
+
+efficiency:
+- write a version of pexists that is *all* XS?
+- win32: use a process snapshot when we ask about a lot of PIDs,
+  heuristically choose at runtime which code to run based on #pids
+
+there must be some way to do a windows/pure perl implementation, but 
+kill() and then check errno isn't it...
+  (0,4,184,1164 are owned by system, 472, 1472 owned by same user):
+pid: 0, out: 0, err: Invalid argument (22)
+pid: 4, out: 0, err: Invalid argument (22)
+pid: 184, out: 0, err: Invalid argument (22)
+pid: 472, out: 1, err: Invalid argument (22)
+pid: 1472, out: 1, err: Invalid argument (22)
+pid: 1164, out: 0, err: Invalid argument (22)
+
+review all cpants 0.15 messages (after 69 passes #1738784)
+
+for better test coverage of pureperl stuff via cpants, make a test 
+script that always runs pureperl, not C (an argument to use?) ?? note 
+this would break win32/strawberry, so we'd have to check $^O and skip 
+in that case...
+
+svnamdin dump + svnadmin load.  dump from the old, load into the new
+to get this stuff into chronicle svn
+
+Perl::Critic and Kwalitee info:
+  http://www.slideshare.net/kcowgill/testing-code-and-assuring-quality/
+  http://cpants.perl.org/kwalitee.html
+

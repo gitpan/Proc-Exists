@@ -68,7 +68,7 @@ on them all, which is the default behavior.
 
 =item B<-i, --interval>
 
-Amount of time (in seconds, fractions ok) to wait between checking for 
+Amount of time (in seconds, decimals ok) to wait between checking for 
 process updates. Note that this check is cheap, and even if you are 
 checking lots of processes, specifying a value near your machine's HZ 
 value is probably fine.

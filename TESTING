@@ -16,39 +16,69 @@ testing on POSIX systems:
 ## most tested like so: perl Makefile.PL ; make distclean ; perl Makefile.PL && make && make test ; echo -n "w/ cc tests above (hit enter)..." ; read X ; make distclean ; sudo mv /usr/bin/cc /usr/bin/gcc ~/ ;  perl Makefile.PL && make && make test ; echo those were tests w/o cc ; sudo mv ~/cc ~/gcc /usr/bin/
 osname/distribution/archname(human name)/osvers/perlvers: last version tested
 -----------------------------------------------------------------------------
-linux/ubu-hardy/x86_64-linux-gnu-thread-multi(amd64)/2.6.24-17/v5.8.8:   0.15
-linux/ubu-feisty/powerpc-linux-gnu-thread-multi(ppc)/2.6.20-16/v5.8.8:   0.15
-linux/deb-sarge/i386-linux-thread-multi(x86)/2.4.27-3/v5.8.8:            0.15
-linux/deb-etch/x86_64-linux-gnu-thread-multi(amd64)/2.6.18-6/v5.8.8:     0.15
-linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.24.4/v5.8.8:         0.15
-solaris/v10,gcc/i86pc-solaris-64int(x86)/2.10/v5.8.4:                    0.15
-freebsd/6.2/i386-freebsd-64int(x86)/GENERIC/v5.8.8:                      0.15
-freebsd/4.11/i386-freebsd(x86)/GENERIC/v5.5.3:                           0.15
-openbsd/4.3/i386-openbsd(x86)/GENERIC/v5.8.8:                            0.15
-netbsd/4.0/i386-netbsd-thread-multi(x86)/GENERIC/v5.8.8:                 0.15
-darwin-osx/9.0/darwin-thread-multi-2level(x86/amd64)/10.5.2/v5.8.8       0.15
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:            0.15
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:             0.15
-winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:        0.15
+linux/ubu-hardy/x86_64-linux-gnu-thread-multi(amd64)/2.6.24-17/v5.8.8:   0.90
+linux/ubu-feisty/powerpc-linux-gnu-thread-multi(ppc)/2.6.20-16/v5.8.8:   0.90
+linux/deb-sarge/i386-linux-thread-multi(x86)/2.4.27-3/v5.8.8:            0.90
+linux/deb-etch/x86_64-linux-gnu-thread-multi(amd64)/2.6.18-6/v5.8.8:     0.90
+linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.24.4/v5.8.8:         0.90
+solaris/v10,gcc/i86pc-solaris-64int(x86)/2.10/v5.8.4:                    0.90
+freebsd/6.2/i386-freebsd-64int(x86)/GENERIC/v5.8.8:                      0.90
+freebsd/4.11/i386-freebsd(x86)/GENERIC/v5.5.3:                           0.90
+openbsd/4.3/i386-openbsd(x86)/GENERIC/v5.8.8:                            0.90
+netbsd/4.0/i386-netbsd-thread-multi(x86)/GENERIC/v5.8.8:                 0.90
+darwin-osx/9.0/darwin-thread-multi-2level(x86/amd64)/10.5.2/v5.8.8       0.90
+winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:            0.90
+winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:             0.90
+winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:        0.90
 winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:         FAIL
-winXP32/SP2/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:        0.13
+winXP32/SP2/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:        0.15
 winXP32/SP2/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:         FAIL
 openbsd/4.2/i386-openbsd(x86)/GENERIC/v5.8.8:                            0.13
 
 --- platforms tested via cpants ---
-http://www.nntp.perl.org/group/perl.cpan.testers/$test_id
-platform        | version |   perl versions     | test_id(s)
-freebsd6.1/x86  |  0.13   | 5.10.0,5.6.2,5.5.5  | 1738784,1727352,1727263
-freebsd7.0/x86  |  0.13   | 5.10.0,5.11.0       | 1641915,1638524
-irix6.5/mips    |  0.13   | 5.8.8               | 1610056
-linux2.6/x86    |  0.13   | 5.6.2,5.10.0,5.11.0 | 1736939,1710302,1706516
-openbsd4.1/x86  |  0.13   | 5.11.0              | 1667882 
-osx/ppc         |  0.13   | 5.6.2,5.8.8,5.10.0  | 1603341,1603349,1603336
-netbsd2.1/alpha |  0.13   | 5.10.0              | 1610123
-netbsd3.1/x86   |  0.13   | 5.6.2,5.8.x,5.10.0  | 1604170,1604221,1604165
-netbsd4.0/x86   |  0.13   | 5.10.0              | 1638524
-solaris9/sparc  |  0.13   | 5.10.0              | 1610143
-TODO: fill in pre-0.13 reports?
+## see: http://www.nntp.perl.org/group/perl.cpan.testers/$test_id
+## note: the above platforms/perl combinations are omitted b/c they
+## were tested by the author before upload ( except in 0.14, oops ;-) )
+platform        | perl versions       | test_id(s)
+--- 0.15
+freebsd6.1/x86  | 5.6.2,5.10.0        | 1758565,1758342
+linux2.6/x86    | 5.6.2,5.10.0,5.11.0 | 1759827,1755611,1767624
+netbsd3.1/x86   | 5.6.2,5.8.x,5.10.0  | 1763365,1763372,1763358
+darwin-osx/ppc  | 5.6.2,5.8.8,5.10.0  | 1757567,1757571,1757565
+solaris9/sparc  | 5.10.0              | 1762196
+--- 0.14 (mistaken release, broke 5.5.x/XS)
+--- 0.13
+freebsd6.1/x86  | 5.10.0,5.6.2,5.5.5  | 1738784,1727352,1727263
+freebsd7.0/x86  | 5.10.0,5.11.0       | 1641915,1638524
+irix6.5/mips    | 5.8.8               | 1610056
+linux2.6/x86    | 5.6.2,5.10.0,5.11.0 | 1736939,1710302,1706516
+netbsd2.1/alpha | 5.10.0              | 1610123
+netbsd3.1/x86   | 5.6.2,5.8.x,5.10.0  | 1604170,1604221,1604165
+netbsd4.0/x86   | 5.10.0              | 1638524
+openbsd4.1/x86  | 5.11.0              | 1667882 
+darwin-osx/ppc  | 5.6.2,5.8.8,5.10.0  | 1603341,1603349,1603336
+solaris9/sparc  | 5.10.0              | 1610143
+--- 0.12 (not done)
+--- 0.11 (not done)
+--- 0.10
+cygwin1.5.24          | 5.8.8,  5.10.0, 5.11.0
+freebsd6.1/x86        | 5.5.5,  5.6.2,  5.8.8,  5.10.0, 5.11.0
+freebsd6.2/amd64      | 5.5.5,  5.6.2,  5.8.8,  5.10.0
+freebsd6.2/x86        | 5.8.8,  5.10.0
+linux2.6/alpha        | 5.10.0, 5.11.0
+linux2.6/x86          | 5.6.2,  5.10.0, 5.11.0
+linux2.6/amd64        | 5.10.0, 5.11.0
+netbsd2.1.0/alpha     | 5.10.0
+netbsd3.1/x86         | 5.6.2,  5.8.8, 5.10.0
+netbsd4.0/x86         | 5.10.0
+openbsd4.1/x86        | 5.8.8,  5.10.0
+openbsd4.2/x86        | 5.8.8
+darwin-osx-7.9.0/ppc  | 5.8.1
+darwin-osx-8.10.0/ppc | 5.6.2,  5.8.8,  5.10.0, 5.11.0
+darwin-osx-8.10.1/x86 | 5.10.0
+solaris9/sparc        | 5.8.8,  5.10.0
+solaris10/x86         | 5.8.8,  5.10.0
+winxp/sp2/strawberry  | 5.10.0
 
 --- untested platforms ---
 win:   vista? 64-bit windows? non-NT windows: winME, w98, w95? activestate?

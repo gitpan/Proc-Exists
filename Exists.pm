@@ -9,9 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.15';
-
-my $use_scalar_pexists = ($^O ne 'MSWin32');
+$VERSION = '0.90';
 
 eval {
 	require XSLoader;
@@ -21,51 +19,77 @@ eval {
 	my $EPERM = $Proc::Exists::Configuration::EPERM; 
 	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
 	my $pp_pexists = sub {
-		my $pid = $_[0]; 
-		if (kill 0, $pid) {
-			return 1;
-		} else {
-			if($! == $EPERM) {
-				return 1;
-			} elsif($! == $ESRCH) {
-				return 0;
-			} elsif($^O eq "MSWin32") {
-				die "can't do pure perl on MSWin32 - \$!: (".(0+$!)."): $!"; 
-			} else {
-				die "unknown numeric \$!: (".(0+$!)."): $!, pureperl, OS: $^O"; 
-			}
+		my @pids = @_; 
+		my %args;
+		%args = %{pop(@pids)} if (ref($pids[-1]));
+
+		if(wantarray && %args) {
+			die "can't specify all argument in list context" if($args{all}); 
+			die "can't specify any argument in list context" if($args{any}); 
 		}
-	};
-	$use_scalar_pexists = 0;
-	*_pexists = \&$pp_pexists; 
-}
 
-sub pexists {
-	my @pids = @_; 
-	my %args = %{ref($pids[-1]) ? pop(@pids) : {}};
-
-	my @results; 
-	if(wantarray || !$use_scalar_pexists) {
+		my @results; 
 		foreach my $pid (@pids) {
+			#ASSUMPTION: no systems allow a negative int as a PID
 			die "got non-integer pid: $pid" if($pid !~ /^\d+$/); 
-			my $ret = _pexists($pid); 
-			if($ret < 0) {
-				$ret += 2;
-				#TODO: better error message here
-				warn "windows ignored the bottom 2 bits of the pid $pid, unexpected results may occur!";
+
+			my $ret; 
+			if (kill 0, $pid) {
+				$ret = 1;
+			} else {
+				if($! == $EPERM) {
+					$ret = 1;
+				} elsif($! == $ESRCH) {
+					$ret = 0;
+				} elsif($^O eq "MSWin32") {
+					die "can't do pure perl on MSWin32 - \$!: (".(0+$!)."): $!"; 
+				} else {
+					die "unknown numeric \$!: (".(0+$!)."): $!, pureperl, OS: $^O"; 
+				}
 			}
+	
 			if($ret) {
-				return 1 if($args{any}); 
+				return $pid if($args{any}); 
 				push @results, $pid; 
 			} elsif($args{all}) {
 				return 0;
 			}
 		}
 		return wantarray ? @results : scalar @results; 
-	} else {
-		return _scalar_pexists([@pids], $args{any} || 0, $args{all} || 0);
-	}
+	};
+	*pexists = \&$pp_pexists; 
+
+} else {
+
+	my $xs_pexists = sub {
+		my @pids = @_; 
+		my %args;
+		%args = %{pop(@pids)} if (ref($pids[-1]));
+
+		if(wantarray) {
+			if(%args) {
+				die "can't specify all argument in list context" if($args{all}); 
+				die "can't specify any argument in list context" if($args{any}); 
+			}
+			return _list_pexists([@pids]); 
+		} else {
+			return _scalar_pexists([@pids], $args{any} || 0, $args{all} || 0);
+		}
+	};
+	*pexists = \&$xs_pexists; 
+
 }
+
+# !wantarray        : return number of matches
+# !wantarray && any : return pid of first match if any match, else 0
+#   FIXME: TODO: testcases
+#   FIXME: TODO: what about systems where 0 is a valid pid?
+#   perhaps return undef instead of 0 in this case?
+# !wantarray && all : return 1 if all match, else undef
+#  wantarray        : return list of matching pids
+#  wantarray && any : undefined, makes no sense
+#   ALTERNATELY: could return list of size one with first matching pid
+#  wantarray && all : undefined, makes no sense
 
 1;
 __END__
@@ -84,18 +108,22 @@ This document describes Proc::Exists
 
    use Proc::Exists qw(pexists);
 
-   my $dead_or_alive       = pexists($pid); 
-   my @survivors           = pexists(@pid_list); 
-   my $nsurvivors          = pexists(@pid_list); 
-   my $at_least_one_lived  = pexists(@pid_list, {any => 1});
-   my $all_pids_lived      = pexists(@pid_list, {all => 1});
+   my $dead_or_alive        = pexists($pid); 
+   my @survivors            = pexists(@pid_list); 
+   my $nsurvivors           = pexists(@pid_list); 
+   my $pid_of_one_survivor  = pexists(@pid_list, {any => 1});
+   my $bool_all_pids_lived  = pexists(@pid_list, {all => 1});
 
   
 =head1 FUNCTIONS
 
 =head2 pexists( @pids, [ $args_hashref ] )
 
-Supported arguments are 'any' and 'all'. See details above.
+Supported arguments are 'any' and 'all', as shown above.
+
+The 'any' argument returns the pid of the first process found.
+
+In list context, giving the 'any' or 'all' arguments will error out.
 
 
 =head1 DESCRIPTION

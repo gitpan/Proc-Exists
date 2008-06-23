@@ -8,8 +8,10 @@ META.yml
 Makefile.PL
 README
 TESTING
+TODO
 examples/pswait
 misc/gather-info.pl
+pexists.h
 ppport.h
 t/00.load.t
 t/01.info.t
