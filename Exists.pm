@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.90';
+$VERSION = '0.91';
 
 eval {
 	require XSLoader;
@@ -20,8 +20,7 @@ eval {
 	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
 	my $pp_pexists = sub {
 		my @pids = @_; 
-		my %args;
-		%args = %{pop(@pids)} if (ref($pids[-1]));
+		my %args = %{pop(@pids)} if (ref($pids[-1]));
 
 		if(wantarray && %args) {
 			die "can't specify all argument in list context" if($args{all}); 
@@ -63,8 +62,7 @@ eval {
 
 	my $xs_pexists = sub {
 		my @pids = @_; 
-		my %args;
-		%args = %{pop(@pids)} if (ref($pids[-1]));
+		my %args = %{pop(@pids)} if (ref($pids[-1]));
 
 		if(wantarray) {
 			if(%args) {
@@ -88,8 +86,10 @@ eval {
 # !wantarray && all : return 1 if all match, else undef
 #  wantarray        : return list of matching pids
 #  wantarray && any : undefined, makes no sense
-#   ALTERNATELY: could return list of size one with first matching pid
+#   ALTERNATELY: could return list of size one with first matching pid, 
+#                else bare return
 #  wantarray && all : undefined, makes no sense
+#   ALTERNATELY: could return list of all pids on true, else bare return
 
 1;
 __END__

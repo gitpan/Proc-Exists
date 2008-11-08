@@ -1,5 +1,12 @@
 Revision history for Proc-Exists
 
+0.91  2008-11-08 22:49 GMT  rev. 437
+   - pureperl Makefile.PL goop: use Errno @ la POSIX if it's available
+   - Makefile.PL now accepts an optional -cc=/path/to/c-compiler
+   - Makefile.PL will try $ENV{CC} if it exists
+   - add warning about HPUX and why we usually need pureperl there
+   - silence warnings when Makefile.PL is invoked with perl -w
+
 0.90  2008-06-23 08:52 GMT  rev. 409
    - API change: pexists(... {any=>1}) returns pid of process found
    - API now frozen until 1.00
@@ -9,7 +16,7 @@ Revision history for Proc-Exists
      perl "wrapping" around raw XS in this case
    - clean up lots of duplication in XS via static inline __pexists in
      pexists.h
-   - _scalar_pexists now works for win32
+   - _scalar_pexists now works on win32
 
 0.15  2008-06-21 09:53 GMT  rev. 380
    - fix XS on perl 5.5.x

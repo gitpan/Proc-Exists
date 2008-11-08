@@ -1,13 +1,16 @@
-"always return undef, not 0, for false" audit
+make sure t/02.usage.t covers the entirety of the API as in the POD
+
+"always return undef, not 0, for false" audit (for systems like mac os x 
+where 0 is a valid PID)
 
 make a distinct error message for negative integers from string pids,
 test what happens if passed a float, a ref, etc. and make distinct
 errors as necessary for them.
 
-also a Makefile.PL option and prompt for selecting a specific CC, 
-shortcutting the auto-detect code, same as done for xs/pp
-
 -- release 0.91 --
+
+see if there is a pureperl win32 possibility via Win32:
+  http://perldoc.perl.org/Win32.html
 
 efficiency:
 - write a version of pexists that is *all* XS?
