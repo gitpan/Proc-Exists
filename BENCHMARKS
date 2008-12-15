@@ -61,15 +61,16 @@ sleep 60 & \
    )
 
 
-NOTE: the behavior of perl/select is essentially the following:
-For sleep values down to 1/Hz setting, sleep for approximately the time 
-inicated. For values below that, sleep 1/Hz seconds instead. For values 
-*WAY* below that, don't even give up control! So if you use this to 
-poll if another process is ready (not to be used as a substitute for a 
-proper lock, only as an adjunct/optimization!), don't make the mistake
-of sleeping for 0 or even 0.0000001 seconds, figuring that will give up 
-control to another process. it won't! this behavior may or may not be 
-different on other unix variants.
+NOTE: the behavior of perl/select under linux is essentially the 
+following: For sleep values down to 1/Hz setting, sleep for 
+approximately the time indicated. For values below that, sleep 1/Hz 
+seconds instead. For values *WAY* below that, don't even give up 
+control! So if you use this to poll if another process is ready (not to 
+be used as a substitute for a proper lock, only as an 
+adjunct/optimization!), don't make the mistake of sleeping for 0 or even 
+0.0000001 seconds, figuring that will give up control to another 
+process. it won't! this behavior may or may not be different on other 
+unix variants.
 
 INTERVAL=0.01; sleep 60 &
    ( sleep .5 ; pid=$! ; time perl -e \

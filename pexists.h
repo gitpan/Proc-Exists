@@ -1,3 +1,13 @@
+static int __is_int(char *str, int strlen) {
+	int i;
+
+	for(i=0; i<strlen; i++) {
+		if(str[i] == '.') { return 0; }
+	}
+
+	return 1;
+}
+
 //it seems a waste to have this file just for one static function...
 //is there some way to pull it into the XS?
 static int __pexists(int pid) {
@@ -13,7 +23,7 @@ static int __pexists(int pid) {
 	PROCESSENTRY32 pe32;
 	DWORD err;
 
-	if (pid < 0) { croak("got non-integer pid"); }
+	if (pid < 0) { croak("got negative pid: '%d'", pid); }
 
 #ifdef win32_pids_mult4
 	if(pid % 4) {
@@ -31,7 +41,7 @@ static int __pexists(int pid) {
 #else
 	int ret;
 
-	if (pid < 0) { croak("got non-integer pid"); }
+	if (pid < 0) { croak("got negative pid: '%d'", pid); }
 
 	ret = kill(pid, 0);
 	//existent process w/ perms:  ret: 0

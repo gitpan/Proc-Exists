@@ -17,7 +17,7 @@ testing on POSIX systems w/ recent Bundle::CPAN:
 osname/distribution/archname(human name)/osvers/perlvers: last version tested
 note: in a few cases (hpux, win) we overload compiler name in place of osvers
 -----------------------------------------------------------------------------
-linux/ubu-intrepid/x86_64-linux-gnu-thread-multi(amd64)/2.6.27-7/v5.10.0: 0.91
+linux/ubu-intrepid/x86_64-linux-gnu-thread-multi(amd64)/2.6.27-7/v5.10.0: 0.92
 linux/ubu-hardy/x86_64-linux-gnu-thread-multi(amd64)/2.6.24-21/v5.8.8:    0.91
 linux/deb-etch/alpha-linux-gnu-thread-multi/2.6.18-6/5.8.8:               0.91
 linux/deb-etch/hppa-linux-gnu-thread-multi/2.6.18-6/5.8.8:                0.91
@@ -26,21 +26,23 @@ linux/deb-sarge/i486-linux-gnu-thread-multi(x86)/2.6.18-6/v5.8.8:         0.91
 linux/deb-sarge/i386-linux-thread-multi(x86)/2.4.27-3/v5.8.8:             0.91
 linux/deb-etch/x86_64-linux-gnu-thread-multi(amd64)/2.6.18-6/v5.8.8:      0.91
 linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.24.4/v5.8.8:          0.91
-darwin-osx/8.0/darwin-thread-multi-2level(ppc)/10.4.11/v5.8.6             0.91
+darwin-osx/8.0/darwin-thread-multi-2level(ppc)/10.4.11/v5.8.6             0.92
 freebsd/6.2/i386-freebsd-64int(x86)/GENERIC/v5.8.8:                       0.91
 freebsd/4.11/i386-freebsd(x86)/GENERIC/v5.5.3:                            0.91
 openbsd/4.3/i386-openbsd(x86)/GENERIC/v5.8.8:                             0.91
+opensolaris/2008-11/i86pc-solaris-64int(x86)/?/?:                         0.92
 netbsd/4.0/i386-netbsd-thread-multi(x86)/GENERIC/v5.8.8:                  0.91
-opensolaris/2008-05/i86pc-solaris-64int(x86)/2.11/v5.8.4:                 0.91
+nexenta/2.0a/i386-pc-solaris2.11-thread-multi(x86)/2.11/v5.8.8:           0.91
 solaris/v10,gcc/i86pc-solaris-64int(x86)/2.10/v5.8.4:                     0.91
 hpux/11.00/PA-RISC1.1-thread-multi(hppa)/PP-ONLY/v5.8.2:                  0.91
 darwin-osx/9.0/darwin-thread-multi-2level(x86)/10.5.5/v5.8.8:             0.91
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:             0.91
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:              0.91
-winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:         0.91
+winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:             0.92
+winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:              0.92
+winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:         0.92
 winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:          FAIL
 
 systems i can no longer (easily) access:
+opensolaris/2008-05/i86pc-solaris-64int(x86)/2.11/v5.8.4:                 0.91
 darwin-osx/9.0/darwin-thread-multi-2level(x86)/10.5.2/v5.8.8:             0.90
 linux/ubu-feisty/powerpc-linux-gnu-thread-multi(ppc)/2.6.20-16/v5.8.8:    0.90
 openbsd/4.2/i386-openbsd(x86)/GENERIC/v5.8.8:                             0.13

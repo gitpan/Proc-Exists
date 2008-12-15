@@ -7,7 +7,7 @@ make a distinct error message for negative integers from string pids,
 test what happens if passed a float, a ref, etc. and make distinct
 errors as necessary for them.
 
--- release 0.91 --
+-- release 0.92 --
 
 see if there is a pureperl win32 possibility via Win32:
   http://perldoc.perl.org/Win32.html

@@ -1,4 +1,4 @@
-Proc-Exists version 0.91
+Proc-Exists version 0.92
 
 This is a small module which quickly checks for process existence via
 kill() or equivalent (on win32, OpenProcess(PROCESS_QUERY_INFORMATION...)

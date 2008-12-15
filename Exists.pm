@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.91';
+$VERSION = '0.92';
 
 eval {
 	require XSLoader;
@@ -30,7 +30,15 @@ eval {
 		my @results; 
 		foreach my $pid (@pids) {
 			#ASSUMPTION: no systems allow a negative int as a PID
-			die "got non-integer pid: $pid" if($pid !~ /^\d+$/); 
+			if($pid !~ /^\d+$/) {
+				if($pid =~ /^-\d+$/) {
+					die "got negative pid: '$pid'"; 
+				} elsif($pid =~ /^-?\d+\./) {
+					die "got non-integer pid: '$pid'"; 
+				} else {
+					die "got non-number pid: '$pid'"; 
+				}
+			}
 
 			my $ret; 
 			if (kill 0, $pid) {

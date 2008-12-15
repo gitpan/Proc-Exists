@@ -50,6 +50,7 @@ _scalar_pexists(pids_ref, any, all)
 		int exists;
 		int total=0;
 		int pid;
+		char *pidstr;
 //warn("inXS: _scalar_pexists");
 
 		//make sure pids_ref is a ref pointing at an array with some elements
@@ -63,11 +64,28 @@ _scalar_pexists(pids_ref, any, all)
 		RETVAL=RETVAL_IS_UNSET;
 		for(i=0; i<=npids; i++) {
 			pid_sv = *av_fetch(pids, i, 0);
+
 			//verify pid is an integer... or else "abc" becomes (int)(0)
-			if (!SvIOKp(pid_sv)) {
-				croak("got non-integer pid: %s", SvPV_nolen(pid_sv));
+			//note: if the scalar isn't in int-ready format, make it so and
+			//do error checking to rule out strings like "abc", floats like
+			//1.32, and negative integers
+			if(!SvIOKp(pid_sv)) {
+				pidstr = SvPV_nolen(pid_sv);
+				if(__is_int(pidstr, SvLEN(pid_sv))) {
+					if(sscanf(pidstr, "%d", &pid) == 0) {
+						croak("got non-number pid: '%s'", pidstr);
+					} else {
+						//warn("converted %s to int: %d outside of perlapi", pidstr, pid);
+					}
+				} else {
+					croak("got non-integer pid: '%s'", pidstr);
+				}
+			} else {
+				pid = SvIV(pid_sv);
 			}
-			pid = SvIV(pid_sv);
+			if (pid < 0) {
+				croak("got negative pid: '%s'", SvPV_nolen(pid_sv));
+			}
 
 			exists = __pexists(pid);
 
@@ -96,6 +114,7 @@ _list_pexists(pids_ref)
 		int i;
 		int exists;
 		int pid;
+		char *pidstr;
 //warn("inXS: _list_pexists");
 
 		//make sure pids_ref is a ref pointing at an array with some elements
@@ -108,11 +127,28 @@ _list_pexists(pids_ref)
 	PPCODE:
 		for(i=0; i<=npids; i++) {
 			pid_sv = *av_fetch(pids, i, 0);
+
 			//verify pid is an integer... or else "abc" becomes (int)(0)
-			if (!SvIOKp(pid_sv)) {
-				croak("got non-integer pid: %s", SvPV_nolen(pid_sv));
+			//note: if the scalar isn't in int-ready format, make it so and
+			//do error checking to rule out strings like "abc", floats like
+			//1.32, and negative integers
+			if(!SvIOKp(pid_sv)) {
+				pidstr = SvPV_nolen(pid_sv);
+				if(__is_int(pidstr, SvLEN(pid_sv))) {
+					if(sscanf(pidstr, "%d", &pid) == 0) {
+						croak("got non-number pid: '%s'", pidstr);
+					} else {
+						//warn("converted %s to int: %d outside of perlapi", pidstr, pid);
+					}
+				} else {
+					croak("got non-integer pid: '%s'", pidstr);
+				}
+			} else {
+				pid = SvIV(pid_sv);
 			}
-			pid = SvIV(pid_sv);
+			if (pid < 0) {
+				croak("got negative pid: '%s'", SvPV_nolen(pid_sv));
+			}
 
 			exists = __pexists(pid);
 

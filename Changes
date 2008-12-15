@@ -1,5 +1,11 @@
 Revision history for Proc-Exists
 
+0.92  2008-12-15 13:06 GMT  rev. 448
+   - XS: coerce input pids to int but still check them for sanity
+     (die when asked about a pid '1.23' or 'abc', but '3' is ok)
+     this fixes a bug where using xs and calling pexists('3'); would
+     error out instead of doing the same as pexists(3);
+
 0.91  2008-11-08 22:49 GMT  rev. 437
    - pureperl Makefile.PL goop: use Errno @ la POSIX if it's available
    - Makefile.PL now accepts an optional -cc=/path/to/c-compiler

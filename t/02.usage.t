@@ -43,22 +43,31 @@ if ($^O eq 'MSWin32') {
 	}
 }
 
-#a negative pid should give an error: "got non-integer pid"
+#a negative pid should give an error: "got negative pid"
 eval { pexists('-2'); };
-ok($@ && $@ =~ /^got non-integer pid/);
+ok($@ && $@ =~ /^got negative pid/);
 eval { pexists('-2', 3); };
 ok($@);
 #force call to _list_pexists, not _scalar_pexists
 eval { my @x = pexists('-2', 3); };
 ok($@);
 
-#a non-integer pid should give an error: "got non-integer pid"
+#a non-numeric pid should give an error: "got non-integer pid"
 eval { pexists('abc'); };
-ok($@ && $@ =~ /^got non-integer pid/);
+ok($@ && $@ =~ /^got non-number pid/);
 eval { pexists('abc', 3); };
 ok($@);
 #force call to _list_pexists, not _scalar_pexists
 eval { my @x = pexists('abc', 3); };
+ok($@);
+
+#a non-integer pid should give an error: "got non-integer pid"
+eval { pexists('1.23'); };
+ok($@ && $@ =~ /^got non-integer pid/);
+eval { pexists('1.23', 3); };
+ok($@);
+#force call to _list_pexists, not _scalar_pexists
+eval { my @x = pexists('1.23', 3); };
 ok($@);
 
 #make sure this process exists
