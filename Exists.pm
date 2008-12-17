@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.92';
+$VERSION = '0.92_01';
 
 eval {
 	require XSLoader;
@@ -65,6 +65,7 @@ eval {
 		return wantarray ? @results : scalar @results; 
 	};
 	*pexists = \&$pp_pexists; 
+	$Proc::Exists::pureperl = 1;
 
 } else {
 
@@ -83,6 +84,7 @@ eval {
 		}
 	};
 	*pexists = \&$xs_pexists; 
+	$Proc::Exists::pureperl = 0;
 
 }
 

@@ -1,5 +1,9 @@
 Revision history for Proc-Exists
 
+0.92_01 08-12-17 10:47 GMT  rev. 450
+   - upload for cpants, trying to figure out what's up with
+     http://www.nntp.perl.org/group/perl.cpan.testers/2008/12/msg2840424.html
+
 0.92  2008-12-15 13:06 GMT  rev. 448
    - XS: coerce input pids to int but still check them for sanity
      (die when asked about a pid '1.23' or 'abc', but '3' is ok)

@@ -45,6 +45,9 @@ if ($^O eq 'MSWin32') {
 
 #a negative pid should give an error: "got negative pid"
 eval { pexists('-2'); };
+#wtf: http://www.nntp.perl.org/group/perl.cpan.testers/2008/12/msg2840424.html
+#in my own testing, fbsd/{4.11/6.2}/i386 both Pass - maybe i18n related?
+diag( 'imacat dbg: $@: '.$@ );
 ok($@ && $@ =~ /^got negative pid/);
 eval { pexists('-2', 3); };
 ok($@);
