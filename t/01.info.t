@@ -1,3 +1,6 @@
+#!perl
+
+use strict;
 use Proc::Exists;
 use Test::More tests => 1;
 

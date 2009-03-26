@@ -1,3 +1,5 @@
+use strict;
+
 package Proc::Exists::Configuration;
 
 $EPERM = 1;
