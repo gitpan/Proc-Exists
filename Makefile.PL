@@ -84,10 +84,10 @@ if($::EPERM_and_ESRCH_defined) {
 	open(CONF, "<Configuration.pm");
 	my @lines = map { chomp; $_ } <CONF>; 
 	close(CONF);
-	my @t = grep {defined($_)} map { /^\s*\$ESRCH = (\d+)\s*;\s*$/; $1 } @lines; 
+	my @t = grep {defined($_)} map { /^\s*our\s*\$ESRCH = (\d+)\s*;\s*$/; $1 } @lines; 
 	die "Configuration.pm in a weird state, not the right number of ESRCH's\n... if you are confused, restore Exists/Configuration.pm from the distribution\n" if(@t != 1);
 	my $OLD_ESRCH = $t[0]; 
-	@t    = grep {defined($_)} map { /^\s*\$EPERM = (\d+)\s*;\s*$/; $1 } @lines; 
+	@t    = grep {defined($_)} map { /^\s*our\s*\$EPERM = (\d+)\s*;\s*$/; $1 } @lines; 
 	die "Configuration.pm in a weird state, not the right number of EPERM's\n... if you are confused, restore Exists/Configuration.pm from the distribution\n" if(@t != 1);
 	my $OLD_EPERM = $t[0]; 
 	if($EPERM != $OLD_EPERM or $ESRCH != $OLD_ESRCH) {

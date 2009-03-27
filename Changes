@@ -1,6 +1,10 @@
 Revision history for Proc-Exists
 
+0.94  2009-03-27 02:52 GMT  rev. 467
+   - FTBFS bugfix release, oi
+
 0.93  2009-03-26 04:53 GMT  rev. 465
+   - DO NOT USE THIS VERSION, IT IS BROKEN.
    - try again with a "release" version to see if i can catch the
      probable i18n error with imacat's (or some other) smoker...
    - various kwalitee tweaks

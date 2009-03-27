@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.93';
+$VERSION = '0.94';
 
 eval {
 	require XSLoader;

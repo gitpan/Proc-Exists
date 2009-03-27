@@ -1,9 +1,7 @@
-use strict;
-
 package Proc::Exists::Configuration;
 
-$EPERM = 1;
-$ESRCH = 3;
+our $EPERM = 1;
+our $ESRCH = 3;
 
 1;
 __END__
