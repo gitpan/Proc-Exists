@@ -1,5 +1,10 @@
 Revision history for Proc-Exists
 
+0.95  2009-03-28 01:57 GMT  rev. 471
+   - finally fix the failures coming from imacat's smoker.
+     language was a red herring. the problem was using the wrong
+     way to determine length.
+
 0.94  2009-03-27 02:52 GMT  rev. 467
    - FTBFS bugfix release, oi
 

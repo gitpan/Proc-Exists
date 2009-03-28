@@ -51,6 +51,7 @@ _scalar_pexists(pids_ref, any, all)
 		int total=0;
 		int pid;
 		char *pidstr;
+		STRLEN len;
 //warn("inXS: _scalar_pexists");
 
 		//make sure pids_ref is a ref pointing at an array with some elements
@@ -70,8 +71,8 @@ _scalar_pexists(pids_ref, any, all)
 			//do error checking to rule out strings like "abc", floats like
 			//1.32, and negative integers
 			if(!SvIOKp(pid_sv)) {
-				pidstr = SvPV_nolen(pid_sv);
-				if(__is_int(pidstr, SvLEN(pid_sv))) {
+				pidstr = SvPV(pid_sv, len);
+				if(__is_int(pidstr, len)) {
 					if(sscanf(pidstr, "%d", &pid) == 0) {
 						croak("got non-number pid: '%s'", pidstr);
 					} else {
