@@ -1,7 +1,7 @@
-testing on POSIX systems w/ recent Bundle::CPAN:
+testing on recent POSIX systems (ie Test::Harness > 2.99):
   perl Makefile.PL -xs ; make distclean ; perl Makefile.PL -xs ;
     make && make test >xs.test.out 2>&1
-  perl Makefile.PL -pureperl ; make distclean ; perl Makefile.PL -pureperl ;
+  perl Makefile.PL -pp ; make distclean ; perl Makefile.PL -pp ;
     make && make test >pp.test.out 2>&1
   echo === XS make test output ===
   cat xs.test.out
@@ -10,39 +10,46 @@ testing on POSIX systems w/ recent Bundle::CPAN:
   echo XS: `grep Result xs.test.out`
   echo PP: `grep Result pp.test.out`
   rm -f xs.test.out pp.test.out
+# otherwise, use this:
+  perl Makefile.PL -xs;make distclean;perl Makefile.PL -xs &&make &&make test
+  perl Makefile.PL -pp;make distclean;perl Makefile.PL -pp &&make &&make test
 
 ## last tested version list, ? = not yet tested
-## POSIX/UNIX-y OS's are tested both with and without cc
-## most tested like so: perl Makefile.PL ; make distclean ; perl Makefile.PL && make && make test ; echo -n "w/ cc tests above (hit enter)..." ; read X ; make distclean ; sudo mv /usr/bin/cc /usr/bin/gcc ~/ ;  perl Makefile.PL && make && make test ; echo those were tests w/o cc ; sudo mv ~/cc ~/gcc /usr/bin/
+# POSIX/UNIX-y OS's are tested both with and without cc
 osname/distribution/archname(human name)/osvers/perlvers: last version tested
 note: in a few cases (hpux, win) we overload compiler name in place of osvers
 -----------------------------------------------------------------------------
-linux/ubu-intrepid/x86_64-linux-gnu-thread-multi(amd64)/2.6.27-7/v5.10.0: 0.92
-linux/ubu-hardy/x86_64-linux-gnu-thread-multi(amd64)/2.6.24-21/v5.8.8:    0.91
-linux/deb-etch/alpha-linux-gnu-thread-multi/2.6.18-6/5.8.8:               0.91
-linux/deb-etch/hppa-linux-gnu-thread-multi/2.6.18-6/5.8.8:                0.91
-linux/deb-etch/ia64-linux-gnu-thread-multi/2.6.25-2(etchnhalf)/5.8.8:     0.91
-linux/deb-sarge/i486-linux-gnu-thread-multi(x86)/2.6.18-6/v5.8.8:         0.91
-linux/deb-sarge/i386-linux-thread-multi(x86)/2.4.27-3/v5.8.8:             0.91
-linux/deb-etch/x86_64-linux-gnu-thread-multi(amd64)/2.6.18-6/v5.8.8:      0.91
-linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.24.4/v5.8.8:          0.91
-darwin-osx/8.0/darwin-thread-multi-2level(ppc)/10.4.11/v5.8.6             0.92
-freebsd/6.2/i386-freebsd-64int(x86)/GENERIC/v5.8.8:                       0.91
-freebsd/4.11/i386-freebsd(x86)/GENERIC/v5.5.3:                            0.91
-openbsd/4.3/i386-openbsd(x86)/GENERIC/v5.8.8:                             0.91
-opensolaris/2008-11/i86pc-solaris-64int(x86)/?/?:                         0.92
-netbsd/4.0/i386-netbsd-thread-multi(x86)/GENERIC/v5.8.8:                  0.91
-nexenta/2.0a/i386-pc-solaris2.11-thread-multi(x86)/2.11/v5.8.8:           0.91
-solaris/v10,gcc/i86pc-solaris-64int(x86)/2.10/v5.8.4:                     0.91
-hpux/11.00/PA-RISC1.1-thread-multi(hppa)/PP-ONLY/v5.8.2:                  0.91
-darwin-osx/9.0/darwin-thread-multi-2level(x86)/10.5.5/v5.8.8:             0.91
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:             0.92
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:              0.92
-winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:         0.92
-winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:          FAIL
+linux/ubu-intrepid/i486-linux-gnu-thread-multi(x86)/2.6.27-11/v5.10.0:     0.96
+linux/ubu-intrepid/x86_64-linux-gnu-thread-multi(amd64)/2.6.27-11/v5.10.0: 0.96
+linux/ubu-hardy/x86_64-linux-gnu-thread-multi(amd64)/2.6.24-23/v5.8.8:     0.96
+linux/deb-etch/alpha-linux-gnu-thread-multi/2.6.18-6/5.8.8:                0.96
+linux/deb-lenny/arm-linux-gnueabi-thread-multi/2.6.29-rc3-omap1/5.10.0:    0.96
+linux/deb-etch/hppa-linux-gnu-thread-multi/2.6.18-6/5.8.8:                 0.96
+linux/deb-etch/ia64-linux-gnu-thread-multi/2.6.18-6/5.8.8:                 0.96
+linux/deb-sarge/i386-linux-thread-multi(x86)/2.4.27-3/v5.8.8:              0.96
+linux/deb-etch/x86_64-linux-gnu-thread-multi(amd64)/2.6.18-6/v5.8.8:       0.96
+linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.18-6/v5.8.8:           0.96
+linux/deb-lenny/i486-linux-gnu-thread-multi(x86)/2.6.26-1/v5.10.0:         0.96
+linux/deb-etch/powerpc-linux-gnu-thread-multi(ppc)/2.6.18-6/v5.8.8:        0.96
+linux/deb-lenny/sparc-linux-gnu-thread-multi/2.6.26-1/5.10.0:              0.96
+darwin-osx/8.0/darwin-thread-multi-2level(ppc)/10.4.11/v5.8.6:             0.96
+freebsd/6.2/i386-freebsd-64int(x86)/GENERIC/v5.8.8:                        0.96
+freebsd/4.11/i386-freebsd(x86)/GENERIC/v5.5.3:                             0.96
+openbsd/4.3/i386-openbsd(x86)/GENERIC/v5.8.8:                              0.96
+opensolaris/2008-05/i86pc-solaris-64int(x86)/2.11(snv_86)/v5.8.4:          0.96
+opensolaris/2008-11/i86pc-solaris-64int(x86)/2.11(snv_101b)/5.8.4:         0.96
+netbsd/4.0/i386-netbsd-thread-multi(x86)/GENERIC/v5.8.8:                   0.96
+nexenta/2.0a/i386-pc-solaris2.11-thread-multi(x86)/2.11/v5.8.8:            0.91
+solaris/v10,gcc/i86pc-solaris-64int(x86)/2.10(6-06)/v5.8.4:                0.96
+hpux/11.00/PA-RISC1.1-thread-multi(hppa)/PP-ONLY/v5.8.2:                   0.91
+darwin-osx/9.0/darwin-thread-multi-2level(x86)/10.5.5/v5.8.8:              0.91
+winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:              0.96
+winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:               0.96
+winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:          0.96
+winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:           FAIL
 
 systems i can no longer (easily) access:
-opensolaris/2008-05/i86pc-solaris-64int(x86)/2.11/v5.8.4:                 0.91
+linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.18-6/v5.8.8:          0.91
 darwin-osx/9.0/darwin-thread-multi-2level(x86)/10.5.2/v5.8.8:             0.90
 linux/ubu-feisty/powerpc-linux-gnu-thread-multi(ppc)/2.6.20-16/v5.8.8:    0.90
 openbsd/4.2/i386-openbsd(x86)/GENERIC/v5.8.8:                             0.13

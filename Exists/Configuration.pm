@@ -1,7 +1,7 @@
 package Proc::Exists::Configuration;
 
-our $EPERM = 1;
-our $ESRCH = 3;
+$Proc::Exists::Configuration::EPERM = 1;
+$Proc::Exists::Configuration::ESRCH = 3;
 
 1;
 __END__

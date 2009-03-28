@@ -5,7 +5,9 @@
 #ifdef WIN32
 #include <windows.h>
 #include <tlhelp32.h>
-#include <malloc.h> //not there by default, needed for malloc (!)
+#ifndef _MSC_VER
+#include <malloc.h> //not there with gcc-derived builds (strawberryperl, cygwin)
+#endif
 #else
 #include <sys/types.h>
 #include <signal.h>

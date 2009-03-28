@@ -1,5 +1,9 @@
 Revision history for Proc-Exists
 
+0.96  2009-03-28 23:39 GMT  rev. 477
+   - fix Configuration.pm magic on perls <5.6 (broken since 0.94/r466)
+   - patch from Serguei Trouchelle for building with MSVC
+
 0.95  2009-03-28 01:57 GMT  rev. 471
    - finally fix the failures coming from imacat's smoker.
      language was a red herring. the problem was using the wrong
