@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.96';
+$VERSION = '0.97';
 
 eval {
 	require XSLoader;
@@ -20,11 +20,12 @@ eval {
 	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
 	my $pp_pexists = sub {
 		my @pids = @_; 
-		my %args = %{pop(@pids)} if (ref($pids[-1]));
+		my %args = ();
+		%args = %{pop(@pids)} if (ref($pids[-1]));
 
 		if(wantarray && %args) {
-			die "can't specify all argument in list context" if($args{all}); 
-			die "can't specify any argument in list context" if($args{any}); 
+			die "can't specify 'all' argument in list context" if($args{all}); 
+			die "can't specify 'any' argument in list context" if($args{any}); 
 		}
 
 		my @results; 
@@ -54,7 +55,7 @@ eval {
 					die "unknown numeric \$!: (".(0+$!)."): $!, pureperl, OS: $^O"; 
 				}
 			}
-	
+
 			if($ret) {
 				return $pid if($args{any}); 
 				push @results, $pid; 
@@ -62,6 +63,9 @@ eval {
 				return 0;
 			}
 		}
+		#NOTE: as documented in the pod, any returns undef for false,
+		#      because some systems use pid==0         
+		return if($args{any}); 
 		return wantarray ? @results : scalar @results; 
 	};
 	*pexists = \&$pp_pexists; 
@@ -71,12 +75,13 @@ eval {
 
 	my $xs_pexists = sub {
 		my @pids = @_; 
-		my %args = %{pop(@pids)} if (ref($pids[-1]));
+		my %args = ();
+		%args = %{pop(@pids)} if (ref($pids[-1]));
 
 		if(wantarray) {
 			if(%args) {
-				die "can't specify all argument in list context" if($args{all}); 
-				die "can't specify any argument in list context" if($args{any}); 
+				die "can't specify 'all' argument in list context" if($args{all}); 
+				die "can't specify 'any' argument in list context" if($args{any}); 
 			}
 			return _list_pexists([@pids]); 
 		} else {
@@ -109,11 +114,6 @@ __END__
 Proc::Exists - quickly check for process existence
 
 
-=head1 VERSION
-
-This document describes Proc::Exists
-
-
 =head1 SYNOPSIS
 
    use Proc::Exists qw(pexists);
@@ -121,8 +121,9 @@ This document describes Proc::Exists
    my $dead_or_alive        = pexists($pid); 
    my @survivors            = pexists(@pid_list); 
    my $nsurvivors           = pexists(@pid_list); 
-   my $pid_of_one_survivor  = pexists(@pid_list, {any => 1});
-   my $bool_all_pids_lived  = pexists(@pid_list, {all => 1});
+   my $all_pids_survived    = pexists(@pid_list, {all => 1});
+   my $pid_of_one_survivor_or_undef_if_all_are_dead =
+                              pexists(@pid_list, {any => 1});
 
   
 =head1 FUNCTIONS
@@ -131,10 +132,11 @@ This document describes Proc::Exists
 
 Supported arguments are 'any' and 'all', as shown above.
 
-The 'any' argument returns the pid of the first process found.
-
 In list context, giving the 'any' or 'all' arguments will error out.
 
+The 'any' argument returns the pid of the first process found, or undef 
+if none are found. Note that on some systems, 0 is a valid and usually 
+extant pid - see B<CAVEATS> for more information.
 
 =head1 DESCRIPTION
 
@@ -151,35 +153,54 @@ the pid of the process to check and examining the result and errno.
  * any os with a POSIX layer or win32
  * Test::More if you want to run 'make test'
 
-
-=head1 INCOMPATIBILITIES
-
 It's possible that if you don't have a C compiler, and you're
 running an "obscure" UNIX-y OS (read: not linux, *BSD, solaris,
 or Mac OS X), you might not pass make test. This is because we need
 to compare the value of $! after a call to kill() with EPERM
-and ESRCH. Not wanting to rely on POSIX, we determine EPERM 
-and ESRCH at build (Makefile.PL) time, by using POSIX if it exists
--- but using the common values of EPERM==1 and ESRCH==3 if we can't 
-load POSIX. If you find yourself on such a system, your best bet is to 
-look up EPERM and ESRCH (try grepping for them down /usr/include or 
-wherever your headers are kept). If you get hits back, you can edit 
-Exists/Configuration.pm and add your values there, and re-run the build 
-process. Whether you were successful or not, please send a description
-of what you tried, as well as the output of perl -V and the results of 
-perl misc/gather-info.pl to B<< <ski-cpan@allafrica.com> >> - making
-sure to include Proc::Exists in the subject line (or else I won't read 
-it!) If you had no success, hopefully I'll be able to provide a patch 
-for you, and a fix/workaround for the next release of Proc::Exists. By 
-the way, don't be afraid that we send signal 0 to your processes - kill 
-with signal 0 only indicates if a signal may be sent, it does not 
-actually send any signal, and so will not disrupt any process.
+and ESRCH. Not wanting to rely on Errno or POSIX, we determine EPERM 
+and ESRCH at build (Makefile.PL) time, by using POSIX or Errno if
+it exists -- but using the common values of EPERM==1 and ESRCH==3 if
+we can't load POSIX. If you find yourself on such a system, your best 
+bet is to look up EPERM and ESRCH (try grepping for them down 
+/usr/include or wherever your headers are kept). If you get hits
+back, you can edit Exists/Configuration.pm, add your values there, 
+and re-run the build process. Whether you were successful or not, 
+please send a descriptionof what you tried, as well as the output of 
+perl -V and the results of perl misc/gather-info.pl to B<< 
+<ski-cpan@allafrica.com> >> - making sure to include Proc::Exists in the 
+subject line (or else I won't read it!) If you had no success, 
+hopefully I'll be able to provide a patch for you, and a fix/workaround 
+for the next release of Proc::Exists.
 
 There is no pure perl implementation under Windows. The solution
 is to use Strawberry Perl L<http://strawberryperl.com/>.
 
 Any other OS without a POSIX emulation layer will probably be
 completely non-functional (unless it implements C<kill()>).
+
+
+=head1 CAVEATS
+
+The 'any' argument returns the pid of the first process found, or undef 
+if none are found. Note that on some systems (e.g. OSX), 0 is a valid 
+pid (that almost always exists). Since the 'any' mode will return the 
+first pid that matches, a return value of 0 can indicate that a pid was 
+found. To avoid this problem, make sure you check whether 'any' mode 
+found anything by checking for defined-ness, not whether the result 
+evaluates to true or false in boolean context, like so:
+
+	if(defined(pexists(@pid_list, {any => 1})));
+
+B<< DO NOT >> use this idiom:
+
+	if(pexists(@pid_list, {any => 1}));
+
+Note also that this caveat does NOT apply for "plain" pexists() (ie 
+without 'any' or 'all' arguments), because in scalar context a count is 
+returned, so pexists(0) returns 1 when pid 0 exists, as expected. we 
+only get a pid with 'any' or when we are in list context, and in the 
+latter case, an array of length 1 containing a false value evaluates 
+true in boolean context.
 
 
 =head1 BUGS AND LIMITATIONS
@@ -195,7 +216,7 @@ Proc::Exists in the subject line if you want me to read your message.
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2008, Brian Szymanski B<< <ski-cpan@allafrica.com> >>.
+Copyright (c) 2008-2009, Brian Szymanski B<< <ski-cpan@allafrica.com> >>.
 All rights reserved.
 
 This module is free software; you can redistribute it and/or

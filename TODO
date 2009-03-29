@@ -1,7 +1,8 @@
-make sure t/02.usage.t covers the entirety of the API as in the POD
+TODO before 1.0:
+- code clean up: particularly in the XS and Makefile.PL
+- testing on all I have access to, esp fbsd4.11, osx, win, hpux, solaris
 
-"always return undef, not 0, for false" audit (for systems like mac os x 
-where 0 is a valid PID)
+-- after 1.0 --
 
 see if there is a pureperl win32 possibility via Win32:
   http://perldoc.perl.org/Win32.html

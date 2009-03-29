@@ -46,44 +46,47 @@ if ($^O eq 'MSWin32') {
 	}
 }
 
+my @t;
 #a negative pid should give an error: "got negative pid"
 eval { pexists('-2'); };
-#in my own testing, fbsd/{4.11/6.2}/i386 both Pass - maybe i18n related?
-diag( 'xs dbg: $@: '.$@ );
-#not all locales put the error message first:
-#see: http://www.nntp.perl.org/group/perl.cpan.testers/2008/12/msg2840424.html
 ok($@ && $@ =~ /^got negative pid/);
 
 eval { pexists('-2', 3); };
-ok($@);
+ok($@ && $@ =~ /^got negative pid/);
 #force call to _list_pexists, not _scalar_pexists
 eval { my @x = pexists('-2', 3); };
-ok($@);
+ok($@ && $@ =~ /^got negative pid/);
 
 #a non-numeric pid should give an error: "got non-integer pid"
 eval { pexists('abc'); };
 ok($@ && $@ =~ /^got non-number pid/);
 eval { pexists('abc', 3); };
-ok($@);
+ok($@ && $@ =~ /^got non-number pid/);
 #force call to _list_pexists, not _scalar_pexists
 eval { my @x = pexists('abc', 3); };
-ok($@);
+ok($@ && $@ =~ /^got non-number pid/);
 
 #a non-integer pid should give an error: "got non-integer pid"
 eval { pexists('1.23'); };
 ok($@ && $@ =~ /^got non-integer pid/);
 eval { pexists('1.23', 3); };
-ok($@);
+ok($@ && $@ =~ /^got non-integer pid/);
 #force call to _list_pexists, not _scalar_pexists
 eval { my @x = pexists('1.23', 3); };
-ok($@);
+ok($@ && $@ =~ /^got non-integer pid/);
+
+#API tests: In list context, giving any/all should error out.
+eval { @t = pexists($$, $$, {any => 1}); };
+ok($@ && $@ =~ /^can't specify 'any' argument in list context/);
+eval { @t = pexists($$, $$, {all => 1}); };
+ok($@ && $@ =~ /^can't specify 'all' argument in list context/);
 
 #make sure this process exists
 ok(pexists($$));
-#this process and init should give a count of 2
+#this process and another should give a count of 2
 ok(2 == pexists($another_pid, $$));
 #check array context return
-my @t = pexists($another_pid, $$);
+@t = pexists($another_pid, $$);
 #also check *order* of results
 ok(@t == 2);
 ok($t[0] == $another_pid);
@@ -99,7 +102,14 @@ ok(@t == 2);
 ok($t[0] == $$);
 ok($t[1] == $another_pid);
 ok($$ == pexists($$, $another_pid, $nonexistent_pid, {any => 1}));
-ok(0 == pexists($$, $another_pid, $nonexistent_pid, {all => 1}));
+ok(0 == pexists($nonexistent_pid, $nonexistent_pid));
+ok(!pexists($$, $another_pid, $nonexistent_pid, {all => 1}));
+#NOTE: as documented in the pod, any returns undef for false,
+#      because some systems use pid==0
+ok(!defined(pexists($nonexistent_pid, $nonexistent_pid, {any => 1})));
+#also make sure we get a defined value when we check for $another_pid,
+#  (which is 0 on OSX)
+ok(defined(pexists($another_pid)));
 
 #TODO: these tests are non-deterministic, unless our range a) covers
 #a process we're guaranteed won't go away (e.g. parent on unix, idle on win)
@@ -113,4 +123,5 @@ ok(scalar @t <  scalar @pids_to_strobe);
 #tests on scalar form follow...
 ok(pexists(@pids_to_strobe) < scalar @pids_to_strobe);
 #make sure "all" arg works properly
-ok(0 == pexists(@pids_to_strobe, {all => 1}));
+ok(!pexists(@pids_to_strobe, {all => 1}));
+

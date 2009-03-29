@@ -1,5 +1,7 @@
 package Proc::Exists::Configuration;
 
+use strict;
+
 $Proc::Exists::Configuration::EPERM = 1;
 $Proc::Exists::Configuration::ESRCH = 3;
 

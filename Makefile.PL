@@ -4,7 +4,8 @@ use ExtUtils::MakeMaker;
 use Cwd;
 use Config qw(%Config); #for $Config{cc} 
 
-#use strict; use warnings; #sanity check mucking with Makefile.PL itself
+#uncomment this sanity check when mucking with Makefile.PL itself
+#use strict; use warnings;
 
 my $force_pp = undef;
 my $force_cc = undef;

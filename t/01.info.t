@@ -9,7 +9,7 @@ require Config;
 my $archname = $Config::Config{archname}; 
 my $osvers = $Config::Config{osvers}; 
 diag( "osname: $^O, archname: $archname, osvers: $osvers\n" );
-for my $pid (0..15) {
+for my $pid (0..25) {
 	my $out = kill 0, $pid;
 	diag( "pid: $pid, out: $out, err: $! (".(0+$!).")\n" );
 }

@@ -1,15 +1,14 @@
 static int __is_int(char *str, int strlen) {
-	int i;
+	char *p;
+	char *end = str + strlen;
 
-	for(i=0; i<strlen; i++) {
-		if(str[i] == '.') { return 0; }
+	for(p = str; p<end; ++p) {
+		if(*p == '.') { return 0; }
 	}
 
 	return 1;
 }
 
-//it seems a waste to have this file just for one static function...
-//is there some way to pull it into the XS?
 static int __pexists(int pid) {
 #ifdef WIN32
 	// this is much faster than iterating over a process snapshot,
@@ -19,9 +18,9 @@ static int __pexists(int pid) {
 	// chopping off the bottom two bits, see:
 	// http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
 	HANDLE hProcess;
-	//TODO: CLEANUP: are pe32 and err needed anymore?
-	PROCESSENTRY32 pe32;
-	DWORD err;
+//	//TODO: CLEANUP: are pe32 and err needed anymore?
+//	PROCESSENTRY32 pe32;
+//	DWORD err;
 
 	if (pid < 0) { croak("got negative pid: '%d'", pid); }
 
