@@ -1,3 +1,6 @@
+NOTE: these benchmarks are very outdated at this point. all tests were
+      done with a version of Proc::Exists between versions 0.04 and 0.05
+
 NOTE: pexists/C is only marginally (5-12%) faster than pexists/PP 
 in this case, but there are other cases where the C implementation is
 a factor of 2 faster (scroll down)... This test shows the advantage
@@ -92,5 +95,4 @@ interval\iter/cpu%: imac         hub           lap
 imac = 300MHz G3 PPC,       linux 2.6.20, Hz=250
 hub  = 750MHz P3 x86,       linux 2.4.26, Hz=100
 lap  = 2.3GHz core2 x64_64, linux 2.6.22, Hz=250
-TODO: compare a tickless kernel
 

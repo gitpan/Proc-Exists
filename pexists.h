@@ -18,9 +18,6 @@ static int __pexists(int pid) {
 	// chopping off the bottom two bits, see:
 	// http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
 	HANDLE hProcess;
-//	//TODO: CLEANUP: are pe32 and err needed anymore?
-//	PROCESSENTRY32 pe32;
-//	DWORD err;
 
 	if (pid < 0) { croak("got negative pid: '%d'", pid); }
 

@@ -9,7 +9,7 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.97';
+$VERSION = '0.98';
 
 eval {
 	require XSLoader;
@@ -20,8 +20,7 @@ eval {
 	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
 	my $pp_pexists = sub {
 		my @pids = @_; 
-		my %args = ();
-		%args = %{pop(@pids)} if (ref($pids[-1]));
+		my %args = ref($pids[-1]) ? %{pop(@pids)} : ();
 
 		if(wantarray && %args) {
 			die "can't specify 'all' argument in list context" if($args{all}); 
@@ -75,8 +74,7 @@ eval {
 
 	my $xs_pexists = sub {
 		my @pids = @_; 
-		my %args = ();
-		%args = %{pop(@pids)} if (ref($pids[-1]));
+		my %args = ref($pids[-1]) ? %{pop(@pids)} : ();
 
 		if(wantarray) {
 			if(%args) {
@@ -94,10 +92,7 @@ eval {
 }
 
 # !wantarray        : return number of matches
-# !wantarray && any : return pid of first match if any match, else 0
-#   FIXME: TODO: testcases
-#   FIXME: TODO: what about systems where 0 is a valid pid?
-#   perhaps return undef instead of 0 in this case?
+# !wantarray && any : return pid of first match if any match, else undef
 # !wantarray && all : return 1 if all match, else undef
 #  wantarray        : return list of matching pids
 #  wantarray && any : undefined, makes no sense

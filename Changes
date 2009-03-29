@@ -1,5 +1,12 @@
 Revision history for Proc-Exists
 
+0.99  2009-??-?? ??:?? GMT  rev. ???
+   - micro-optimization galore (a la http://www.ccl4.org/~nick/P/Fast_Enough/)
+
+0.98  2009-03-29 19:40 GMT  rev. 504
+   - move perlcritic, pod, etc. tests to xt as suggeted by David Golden
+     over a year ago
+
 0.97  2009-03-29 07:49 GMT  rev. 492
    - document and improve test case for 0/undef returns with 'any' mode
    - mirror the __scalar_pexists fix from 0.95 in __list_pexists
@@ -132,7 +139,7 @@ Revision history for Proc-Exists
    - Fix some failing tests due to Perl::Critic
 
 0.03  2008-01-19 03:13 GMT  rev. ?
-   - Fall back to pureperl when XS isunavailable
+   - Fall back to pureperl when XS is unavailable
 
 0.02  2008-01-18 23:57 GMT  rev. ?
    - Use kill via XS instead of using /proc

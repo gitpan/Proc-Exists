@@ -1,4 +1,5 @@
 TODO before 1.0:
+- more micro-optimizations and cleanup in Exists.pm
 - code clean up: particularly in the XS and Makefile.PL
 - testing on all I have access to, esp fbsd4.11, osx, win, hpux, solaris
 
