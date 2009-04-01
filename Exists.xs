@@ -30,7 +30,7 @@ MODULE = Proc::Exists		PACKAGE = Proc::Exists
 PROTOTYPES: DISABLE
 
 ### static int _pexists() from pexists.h behaves as follows:
-# returns 1 if the process exists, 0 if it doesn't
+# returns 1 if the process exists, 0 if it doesn't.
 # on win32/NT, can also warn if the pid was not a multiple of 4
 
 # XS implementation for scalar context
@@ -47,9 +47,6 @@ _scalar_pexists(pids_ref, any, all)
 		int exists;
 		int total=0;
 		int pid;
-		char *pidstr;
-		STRLEN len;
-//warn("inXS: _scalar_pexists");
 
 		//make sure pids_ref is a ref pointing at an array with some elements
 		if ((!SvROK(pids_ref)) || (SvTYPE(SvRV(pids_ref)) != SVt_PVAV) || 
@@ -62,30 +59,11 @@ _scalar_pexists(pids_ref, any, all)
 		for(i=0; i<=npids; i++) {
 			pid_sv = *av_fetch(pids, i, 0);
 
-			//verify pid is an integer... or else "abc" becomes (int)(0)
-			//note: if the scalar isn't in int-ready format, make it so and
-			//do error checking to rule out strings like "abc", floats like
-			//1.32, and negative integers
-			if(!SvIOKp(pid_sv)) {
-				pidstr = SvPV(pid_sv, len);
-				if(__is_int(pidstr, len)) {
-					if(sscanf(pidstr, "%d", &pid) == 0) {
-						croak("got non-number pid: '%s'", pidstr);
-					} else {
-						//warn("converted %s to int: %d outside of perlapi", pidstr, pid);
-					}
-				} else {
-					croak("got non-integer pid: '%s'", pidstr);
-				}
-			} else {
-				pid = SvIV(pid_sv);
-			}
-			if (pid < 0) {
-				croak("got negative pid: '%s'", SvPV_nolen(pid_sv));
-			}
+			pid = get_pid(pid_sv);
 
 			exists = __pexists(pid);
 
+			//hook 1
 			if( any && exists ) {
 				RETVAL = pid; break;
 			} else if( all && !exists ) {
@@ -94,6 +72,7 @@ _scalar_pexists(pids_ref, any, all)
 				total+=exists;
 			}
 		}
+		//hook 2
 		if( RETVAL==RETVAL_IS_UNSET ) {
 			//make sure 'any' mode returns undef, not 0
 			if( any ) { XSRETURN_UNDEF; }
@@ -115,9 +94,6 @@ _list_pexists(pids_ref)
 		int i;
 		int exists;
 		int pid;
-		char *pidstr;
-		STRLEN len;
-//warn("inXS: _list_pexists");
 
 		//make sure pids_ref is a ref pointing at an array with some elements
 		if ((!SvROK(pids_ref)) || (SvTYPE(SvRV(pids_ref)) != SVt_PVAV) || 
@@ -129,33 +105,15 @@ _list_pexists(pids_ref)
 		for(i=0; i<=npids; i++) {
 			pid_sv = *av_fetch(pids, i, 0);
 
-			//verify pid is an integer... or else "abc" becomes (int)(0)
-			//note: if the scalar isn't in int-ready format, make it so and
-			//do error checking to rule out strings like "abc", floats like
-			//1.32, and negative integers
-			if(!SvIOKp(pid_sv)) {
-				pidstr = SvPV(pid_sv, len);
-				if(__is_int(pidstr, len)) {
-					if(sscanf(pidstr, "%d", &pid) == 0) {
-						croak("got non-number pid: '%s'", pidstr);
-					} else {
-						//warn("converted %s to int: %d outside of perlapi", pidstr, pid);
-					}
-				} else {
-					croak("got non-integer pid: '%s'", pidstr);
-				}
-			} else {
-				pid = SvIV(pid_sv);
-			}
-			if (pid < 0) {
-				croak("got negative pid: '%s'", SvPV_nolen(pid_sv));
-			}
+			pid = get_pid(pid_sv);
 
 			exists = __pexists(pid);
 
+			//hook 1
 			if(exists) {
 				mXPUSHi(pid);
-			};
+			}
 		}
+		//(no hook 2)
 
 

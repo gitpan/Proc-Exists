@@ -1,3 +1,6 @@
+/*
+ * see if a string can represent a (base10) integer
+ */
 static int __is_int(char *str, int strlen) {
 	char *p;
 	char *end = str + strlen;
@@ -9,6 +12,41 @@ static int __is_int(char *str, int strlen) {
 	return 1;
 }
 
+/*
+ * verify pid is an integer... or else "abc" becomes (int)(0)
+ * note: if the scalar isn't in int-ready format, make it so and
+ * do error checking to rule out strings like "abc", floats like
+ * 1.32, and negative integers
+ */
+static int get_pid(SV* pid_sv) {
+	STRLEN len;
+	char *pidstr = SvPV(pid_sv, len);
+	int pid;
+
+	if(!SvIOKp(pid_sv)) {
+		pidstr = SvPV(pid_sv, len);
+		if(__is_int(pidstr, len)) {
+			if(sscanf(pidstr, "%d", &pid) == 0) {
+				croak("got non-number pid: '%s'", pidstr);
+			} else {
+				//warn("converted %s to int: %d outside of perlapi", pidstr, pid);
+			}
+		} else {
+			croak("got non-integer pid: '%s'", pidstr);
+		}
+	} else {
+		pid = SvIV(pid_sv);
+	}
+	if (pid < 0) {
+		croak("got negative pid: '%s'", SvPV(pid_sv, len));
+	}
+	return pid;
+}
+
+/*
+ * do whatever platform-specific goop is necessary to determine if
+ * a single pid exists or not
+ */
 static int __pexists(int pid) {
 #ifdef WIN32
 	// this is much faster than iterating over a process snapshot,
@@ -18,8 +56,6 @@ static int __pexists(int pid) {
 	// chopping off the bottom two bits, see:
 	// http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
 	HANDLE hProcess;
-
-	if (pid < 0) { croak("got negative pid: '%d'", pid); }
 
 #ifdef win32_pids_mult4
 	if(pid % 4) {
@@ -36,8 +72,6 @@ static int __pexists(int pid) {
 	}
 #else
 	int ret;
-
-	if (pid < 0) { croak("got negative pid: '%d'", pid); }
 
 	ret = kill(pid, 0);
 	//existent process w/ perms:  ret: 0

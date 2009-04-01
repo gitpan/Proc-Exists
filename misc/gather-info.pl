@@ -1,7 +1,7 @@
-#!perl
+#!perl -w
 
-#use warnings; #it's ok if we can't load warnings, but the author should
 use strict;
+eval { require warnings; }; #it's ok if we can't load warnings
 
 my @tests = (
 	{ msg => "nonexistent process" },

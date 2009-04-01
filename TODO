@@ -1,21 +1,25 @@
 TODO before 1.0:
-- more micro-optimizations and cleanup in Exists.pm
-- code clean up: particularly in the XS and Makefile.PL
+- use a new config value, useXS, instead of assuming successful load
+  means we WANTED to load! this will also fix the failing test with PP
+  when an old XS install exists and make testing PP easier.
+- use DynaLoader instead of XSLoader for better old version compat...
+  also we might be able to fix the version mismatch problem a better way
+- update testing to use the new t/00.info.t based format
+- check if this works with perl <5.5 (all the way back to 5.0?)
+  and set META.yml as well as Makefile.PL to use 5.005 or whatever.
+  see http://wiki.cpantesters.org/wiki/CPANAuthorNotes for Makefile.PL info
 - testing on all I have access to, esp fbsd4.11, osx, win, hpux, solaris
+- code clean up and micro-optimization XS, PM, Makefile.PL
 
 -- after 1.0 --
 
-see if there is a pureperl win32 possibility via Win32:
-  http://perldoc.perl.org/Win32.html
-... there must be some way to do a windows/pure perl implementation, but 
-    kill() and then check errno isn't it ...
-      (0,4,184,1164 are owned by system, 472, 1472 owned by same user):
-pid: 0, out: 0, err: Invalid argument (22)
-pid: 4, out: 0, err: Invalid argument (22)
-pid: 184, out: 0, err: Invalid argument (22)
-pid: 472, out: 1, err: Invalid argument (22)
-pid: 1472, out: 1, err: Invalid argument (22)
-pid: 1164, out: 0, err: Invalid argument (22)
+- there must be some way to do a windows/pure perl implementation...
+  see if there is a pureperl win possibility via Win32.pm or
+  Win32::Process. Win32::API is probably the best bet, as we can
+  just sort of port the XS code over into perl-land, but it'll never
+  be as good as XS. it also might be a win just to pull those in if they
+  exist and have something relevant, for people who use activeperl and 
+  don't have a functional cc setup, for example.
 
 efficiency:
 - write a version of pexists that is *all* XS?

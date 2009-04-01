@@ -1,11 +1,18 @@
-#!perl
+#!perl -w
 $|++;
 use ExtUtils::MakeMaker;
 use Cwd;
 use Config qw(%Config); #for $Config{cc} 
 
-#uncomment this sanity check when mucking with Makefile.PL itself
-#use strict; use warnings;
+use strict;
+
+### this Makefile.PL takes some optional arguments:
+###   -pp | -pureperl    don't compile XS, use pure perl implementation
+###   -xs                do compile the XS, don't use perl
+### providing either of the above arguments will also avoid a prompt.
+### additionally, you can specify to use a cc that is not in $PATH or
+### choose one if many available like so:
+###  -cc=/usr/bin/cc    
 
 my $force_pp = undef;
 my $force_cc = undef;
@@ -30,9 +37,8 @@ while($i < @ARGV) {
 }
 #warn "force_cc: $force_cc, pp: $force_pp, ARGV: @ARGV";
 
-# An existing makefile can confuse the CC test.
-unlink('Makefile');
-
+### non-compile-related platform specific hacks go here, for example,
+### on windows NT pids are in multiples of 4
 my $defines = '';
 # win32 crud
 if ($^O eq 'MSWin32') {
@@ -50,7 +56,7 @@ if ($^O eq 'MSWin32') {
 }
 
 ### if we can use Errno or POSIX, find out what EPERM and ESRCH are.
-### if they aren't 1 and 3 (which seems standard), then clobber
+### if they aren't 1 and 3 (which is standard), then clobber
 ### Exists/Configuration.pm with the new values. this is done
 ### here to avoid a dependency on Errno or POSIX, since we almost
 ### never need it (only systems without XS and with non-standard
@@ -81,8 +87,8 @@ if($::EPERM_and_ESRCH_defined) {
 	my $EPERM = eval { EPERM };
 	my $ESRCH = eval { ESRCH };
 	my $wd = getcwd;
-	chdir "Exists";
-	open(CONF, "<Configuration.pm");
+	chdir('Exists') || die "can't change to Exists subdirectory: $!"; 
+	open(CONF, "<Configuration.pm") || die "can't read Configuration.pm: $!";
 	my @lines = map { chomp; $_ } <CONF>; 
 	close(CONF);
 	my @t = grep {defined($_)} map { /^\s*\$Proc::Exists::Configuration::ESRCH\s*=\s*(\d+)\s*;\s*$/; $1 } @lines; 
@@ -97,18 +103,18 @@ if($::EPERM_and_ESRCH_defined) {
 			$lines[$ln] =~ s/^\s*\$EPERM = \d+\s*;\s*$/\$EPERM = $EPERM;/; 
 			$lines[$ln] =~ s/^\s*\$ESRCH = \d+\s*;\s*$/\$ESRCH = $ESRCH;/; 
 		}
-		open(CONF, ">Configuration.pm");
+		open(CONF, ">Configuration.pm") || die "can't write Configuration.pm: $!"; 
 		print CONF "$_\n" foreach @lines; 
 		close(CONF);
 	}
-	chdir($wd); 
+	chdir($wd) || die "can't restore pwd to '$wd': $!"; 
 }
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 my %Makefile = (
 	NAME              => 'Proc::Exists',
-	VERSION_FROM      => 'Exists.pm', # finds $VERSION 
+	VERSION_FROM      => 'Exists.pm',
 	PREREQ_PM         => {
 	                       'Cwd'                 => 0,
 	                       'Config'              => 0,
@@ -117,13 +123,13 @@ my %Makefile = (
 	                       'Test::More'          => 0, 
                         },
 	($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-		(ABSTRACT_FROM => 'Exists.pm', # retrieve abstract from module
+		(ABSTRACT_FROM => 'Exists.pm',
 		 AUTHOR        => 'Brian Szymanski <ski-cpan@allafrica.com>') : ()),
-	LIBS              => [''], # e.g., '-lm'
-	DEFINE            => $defines, # e.g., '-DHAVE_SOMETHING'
-	INC               => '-I.', # e.g., '-I. -I/usr/include/other'
-	#MakeMaker LICENSE support: 6.30 - no, 6.30_0[1234] - yes, 6.31 - yes
-	#also use NO_META here, which is kind of a hack but the machine I 
+	LIBS              => [''],
+	DEFINE            => $defines, 
+	INC               => '-I.',
+	#MakeMaker LICENSE support: 6.30 - no, 6.30_0[1234] - yes, >=6.31 - yes
+	#also use NO_META here, which is kind of a hack, but the machine I 
 	#build on will always have it (>= 6.10_03)
 	($ExtUtils::MakeMaker::VERSION > 6.30 ?
 		(LICENSE => 'perl', NO_META => 1) :()),
@@ -138,8 +144,11 @@ my %Makefile = (
 
 );
 
-# ask if you want to use XS or pureperl (default=XS)
-#TODO: bold this if possible?
+# An existing makefile can confuse the CC test.
+unlink('Makefile');
+
+### ask if you want to use XS or pureperl (default=XS)
+#TODO: bold-ify the prompt if possible...
 if(!defined($force_pp)) {
 	print <<END;
 It is recommended to use the XS code, which is faster, and compatible 
@@ -151,7 +160,7 @@ END
 	$force_pp = prompt("Do you want to forego XS for the pureperl implementation (y/n)?", "no");
 }
 
-#determine what C compiler to use, if any
+### determine what C compiler to use, if any
 my $CC; 
 my $do_hacks; 
 my $use_pp; 
@@ -253,10 +262,12 @@ EOF
 		return "failed";
 	}
 }
+### (finished determining which CC to use)
 
 WriteMakefile(%Makefile);
 
-#on solaris10 with gcc we have to munge the Makefile a bit, ick...
+### more platform-specific hacks - on solaris10 if we want to use gcc,
+### we have to munge the Makefile a bit (ick!)
 if($do_hacks) {
 	system("cp Makefile Makefile.unmangled");
 	if ($do_hacks eq "solaris10_gcc") {

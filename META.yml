@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name:                Proc-Exists
-version:             0.98
-abstract:            quickly check for process existence
+version:             0.99
+abstract:            quickly and portably check for process existence
 license:             perl
 resources:
   license: http://dev.perl.org/licenses/
@@ -11,6 +11,7 @@ requires:
   perl:                5
 recommends:
   Errno:               0
+  XSLoader:            0
 build_requires:
   ExtUtils::MakeMaker: 0
   Test::More:          0

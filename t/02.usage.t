@@ -1,4 +1,4 @@
-#!perl
+#!perl -w
 
 use strict;
 use Test::More 'no_plan';
@@ -80,6 +80,10 @@ eval { @t = pexists($$, $$, {any => 1}); };
 ok($@ && $@ =~ /^can't specify 'any' argument in list context/);
 eval { @t = pexists($$, $$, {all => 1}); };
 ok($@ && $@ =~ /^can't specify 'all' argument in list context/);
+
+#'any' and 'all' makes no sense for us.
+eval { pexists(1, 2, {any => 1, all => 1}) };
+ok($@);
 
 #make sure this process exists
 ok(pexists($$));

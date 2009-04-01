@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use warnings;
+eval { require warnings; }; #it's ok if we can't load warnings
 
 use Proc::Exists qw(pexists);
 

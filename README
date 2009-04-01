@@ -1,9 +1,9 @@
-Proc-Exists version 0.98
+Proc-Exists version 0.99
 
-This is a small module which quickly checks for process existence via
-kill() or equivalent (on win32, OpenProcess(PROCESS_QUERY_INFORMATION...)
-without relying on or incurring the performance overhead of using the 
-/proc filesystem.
+This is a small module which quickly and portably check for process
+existence via kill() or equivalent (on win32,
+OpenProcess(PROCESS_QUERY_INFORMATION...) without relying on or
+incurring the performance overhead of using the /proc filesystem.
 
 INSTALLATION
 

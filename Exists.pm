@@ -1,20 +1,31 @@
 package Proc::Exists;
 
-#use warnings; #it's ok if we can't load warnings, but the author should
 use strict;
 use Proc::Exists::Configuration;
 use vars qw (@ISA @EXPORT_OK $VERSION); 
+eval { require warnings; }; #it's ok if we can't load warnings
 
 require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.98';
+$VERSION = '0.99';
 
 eval {
 	require XSLoader;
 	XSLoader::load('Proc::Exists', $VERSION); 
 }; if($@) {
+	#NOTE: don't need to worry about i18n, {XS|Dyna}Loader complain in english.
+	if($@ =~ /^Can.t\s+locate\s+loadable\s+object\s+for\s+module\s+Proc::Exists/) {
+		#this usually means we want to use pureperl
+	} elsif($@ =~ /Proc::Exists\s+object\s+version\s+\S+\s+does\s+not\s+match\s+bootstrap\s+parameter/ ) {
+		die "ERROR: it looks like you have a previous Proc::Exists version's ".
+           "object file(s) somewhere in \@INC! you will have to remove ".
+           "these and reinstall Proc::Exists -- $@"; 
+	} else {
+		#there was a problem loading the XS, fall back to pureperl
+		warn "WARNING: can't load XS, falling back to pureperl: $@\n"; 
+	}
 	#warn "using pure perl mode, expect degraded performance\n";
 	my $EPERM = $Proc::Exists::Configuration::EPERM; 
 	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
@@ -22,7 +33,8 @@ eval {
 		my @pids = @_; 
 		my %args = ref($pids[-1]) ? %{pop(@pids)} : ();
 
-		if(wantarray && %args) {
+		die "can't specify both 'any' and 'all' arg" if($args{all} && $args{any}); 
+		if(wantarray) {
 			die "can't specify 'all' argument in list context" if($args{all}); 
 			die "can't specify 'any' argument in list context" if($args{any}); 
 		}
@@ -77,12 +89,11 @@ eval {
 		my %args = ref($pids[-1]) ? %{pop(@pids)} : ();
 
 		if(wantarray) {
-			if(%args) {
-				die "can't specify 'all' argument in list context" if($args{all}); 
-				die "can't specify 'any' argument in list context" if($args{any}); 
-			}
+			die "can't specify 'all' argument in list context" if($args{all}); 
+			die "can't specify 'any' argument in list context" if($args{any}); 
 			return _list_pexists([@pids]); 
 		} else {
+			die "can't specify both 'any' and 'all' arg" if($args{all} && $args{any}); 
 			return _scalar_pexists([@pids], $args{any} || 0, $args{all} || 0);
 		}
 	};
@@ -93,7 +104,7 @@ eval {
 
 # !wantarray        : return number of matches
 # !wantarray && any : return pid of first match if any match, else undef
-# !wantarray && all : return 1 if all match, else undef
+# !wantarray && all : return a true value if all match, else a false value
 #  wantarray        : return list of matching pids
 #  wantarray && any : undefined, makes no sense
 #   ALTERNATELY: could return list of size one with first matching pid, 
@@ -106,7 +117,7 @@ __END__
 
 =head1 NAME
 
-Proc::Exists - quickly check for process existence
+Proc::Exists - quickly and portably check for process existence
 
 
 =head1 SYNOPSIS

@@ -1,7 +1,14 @@
 Revision history for Proc-Exists
 
-0.99  2009-??-?? ??:?? GMT  rev. ???
-   - micro-optimization galore (a la http://www.ccl4.org/~nick/P/Fast_Enough/)
+0.99  2009-04-01 05:23 GMT  rev. 537
+   - better handling and detection of XSLoader problems
+   - fix problem with XS on fbsd/4.11 (and other old perls?)
+   - abstract away some redundant XS code into get_pid
+   - cleanups, micro-optimizations, etc.
+   - fix inaccurate system info from info.t (we want the running
+     system, not where perl was built, yikes). also provide some more
+     more information from tests, and rejigger the order in which 
+     things are output, and make the output terser and clearer
 
 0.98  2009-03-29 19:40 GMT  rev. 504
    - move perlcritic, pod, etc. tests to xt as suggeted by David Golden
