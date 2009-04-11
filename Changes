@@ -1,5 +1,26 @@
 Revision history for Proc-Exists
 
+0.99_01 09-04-11 22:50 GMT  rev. 603
+   - fix Makefile.PL getcwd redefined warnings on pre 5.6 perls
+   - in Makefile.PL, never try to use Errno - just use POSIX qw(), since 
+     it's been in core since perl 5.
+   - use Getopt::Long to simplify Makefile.PL
+   - add experimental support for gcc w/ non-gcc perl on other
+     (neither solaris nor hpux) OS's
+   - add support for overriding CFLAGS via Makefile.PL -cflags=...
+   - fix cc version display from info.t with perls built by !gcc
+   - tweak the format of the TESTING file
+   - add test cases: dragonflybsd, ia64/Intel CC with gcc perl
+   - better, cleaner detection and handling of the gcc compiler being
+     used with a non-gcc perl case.
+   - silence warnings with old versions of MakeMaker related to
+     LICENSE and NO_META not being understood
+   - fix a bug with the perl version info emitted from info.t
+   - add a configuration value want_pureperl which remembers if we want
+     to use pureperl or XS. this fixes a problem with old/broken XS 
+     modules in the search path.
+   - support gcc with non-gcc perl on hpux
+
 0.99  2009-04-01 05:23 GMT  rev. 537
    - better handling and detection of XSLoader problems
    - fix problem with XS on fbsd/4.11 (and other old perls?)

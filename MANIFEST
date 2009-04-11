@@ -13,9 +13,9 @@ examples/pswait
 misc/gather-info.pl
 pexists.h
 ppport.h
-t/00.info.t
-t/01.load.t
-t/02.usage.t
+t/00-info.t
+t/01-load.t
+t/02-usage.t
 xt/perlcritic.t
 xt/pod.t
 xt/pod-coverage.t

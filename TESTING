@@ -12,52 +12,56 @@ testing on recent POSIX systems (ie Test::Harness > 2.99):
   rm -f xs.test.out pp.test.out
 # otherwise, use this:
   perl Makefile.PL -xs;make distclean;perl Makefile.PL -xs &&make &&make test
-  perl Makefile.PL -pp;make distclean;perl Makefile.PL -pp &&make &&make test
+  perl Makefile.PL -xs;make distclean;perl Makefile.PL -pp &&make &&make test
 
 ## last tested version list, ? = not yet tested
-# POSIX/UNIX-y OS's are tested both with and without cc
-osname/distribution/archname(human name)/osvers/perlvers: last version tested
-#PP: pureperl only can be tested
-note: in a few cases (hpux, win) we overload compiler name in place of osvers
+osname/os-friendly-name+distro,etc/kernel-version/arch/perlvers/ccname+version
+if (XS|PP) is specified, it means that method passed but the other failed.
+otherwise both were tested. a version of FAIL means no version has passed.
+CC KEY: gcc = gnu cc, sc = Sun C
 -----------------------------------------------------------------------------
-todo: arm/deb, hppa/hpux, solaris10, fbsd4.11
-
-darwin-osx/8.0/darwin-thread-multi-2level(ppc)/10.4.11/v5.8.6:             0.97
-darwin-osx/9.0/darwin-thread-multi-2level(x86)/10.5.5/v5.8.8:              0.97
-freebsd/6.2/i386-freebsd-64int(x86)/GENERIC/v5.8.8:                        0.96
-freebsd/4.11/i386-freebsd(x86)/GENERIC/v5.5.3:                             0.97
-hpux/11.00/PA-RISC1.1-thread-multi(hppa)/B.11.23/v5.8.2:                 PP0.97
-linux/ubu-intrepid/x86_64-linux-gnu-thread-multi(amd64)/2.6.27-11/v5.10.0: 0.99
-linux/ubu-intrepid/i486-linux-gnu-thread-multi(x86)/2.6.27-11/v5.10.0:     0.97
-linux/ubu-hardy/x86_64-linux-gnu-thread-multi(amd64)/2.6.24-23/v5.8.8:     0.96
-linux/deb-etch/alpha-linux-gnu-thread-multi/2.6.18-6/5.8.8:                0.96
-linux/deb-lenny/arm-linux-gnueabi-thread-multi/2.6.29-rc3-omap1/5.10.0:    0.96
-linux/deb-etch/hppa-linux-gnu-thread-multi/2.6.18-6/5.8.8:                 0.96
-linux/deb-etch/ia64-linux-gnu-thread-multi/2.6.18-6/5.8.8:                 0.96
-linux/deb-sarge/i386-linux-thread-multi(x86)/2.4.27-3/v5.8.8:              0.96
-linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.18-6/v5.8.8:           0.96
-linux/deb-lenny/i486-linux-gnu-thread-multi(x86)/2.6.26-1/v5.10.0:         0.96
-linux/deb-etch/powerpc-linux-gnu-thread-multi(ppc)/2.6.18-6/v5.8.8:        0.96
-linux/deb-lenny/sparc-linux-gnu-thread-multi/2.6.26-1/5.10.0:              0.96
-linux/deb-etch/x86_64-linux-gnu-thread-multi(amd64)/2.6.18-6/v5.8.8:       0.96
-openbsd/4.3/i386-openbsd(x86)/GENERIC/v5.8.8:                              0.96
-opensolaris/2008-05/i86pc-solaris-64int(x86)/2.11(snv_86)/v5.8.4:          0.96
-opensolaris/2008-11/i86pc-solaris-64int(x86)/2.11(snv_101b)/5.8.4:         0.96
-netbsd/4.0/i386-netbsd-thread-multi(x86)/GENERIC/v5.8.8:                   0.96
-nexenta/2.0a/i386-pc-solaris2.11-thread-multi(x86)/2.11/v5.8.8:            0.91
-solaris/v10,gcc/i86pc-solaris-64int(x86)/2.10(6-06)/v5.8.4:                0.97
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/gcc/v5.8.8:              0.97
-winXP32/SP3/cygwin-thread-multi-64int(cygwin/x86)/PP/v5.8.8:               0.97
-winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:          0.97
-winXP32/SP3/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:           FAIL
-
-systems i can no longer (easily) access:
-linux/deb-etch/i486-linux-gnu-thread-multi(x86)/2.6.18-6/v5.8.8:          0.91
-darwin-osx/9.0/darwin-thread-multi-2level(x86)/10.5.2/v5.8.8:             0.90
-linux/ubu-feisty/powerpc-linux-gnu-thread-multi(ppc)/2.6.20-16/v5.8.8:    0.90
-openbsd/4.2/i386-openbsd(x86)/GENERIC/v5.8.8:                             0.13
-winXP32/SP2/MSWin32-x86-multi-thread(strawberry/x86)/gcc/v5.10.0:         0.15
-winXP32/SP2/MSWin32-x86-multi-thread(strawberry/x86)/PP/v5.10.0:          FAIL
+darwin/OSX 10.5.5/9.5.0/i386/5.8.8/gcc-4.0.1:                0.99_01PRE-r598
+darwin/OSX 10.4.11/8.11.0/ppc/5.8.6/gcc-3.3:                 0.99_01PRE-r598
+dragonflybsd/2.2.0/RELEASE/5.10.0/gcc-4.1.2:                 0.99_01PRE-r598
+freebsd/4.11/GENERIC/i386/5.5.3/gcc-2.95.2:                  0.99_01PRE-r598
+freebsd/6.2/GENERIC/i386/5.8.8/gcc-3.4.6:                    0.99_01PRE-r598
+HP-UX/11i v2/B.11.23/PA-RISC/5.8.2/HP C-ansi C:(2)           0.99_01PRE-r598
+linux/debian lenny/2.6.29-rc3/arm-gnu-eabi/5.10.0/gcc-4.3.2: 0.99_01PRE-r598
+linux/debian lenny/2.6.26/i686/5.10.0/gcc-4.3.2:             0.99_01PRE-r598
+linux/debian lenny/2.6.26/sparc64/5.10.0/gcc-4.3.2:          0.99_01PRE-r598
+linux/debian etch/2.6.18/alpha/5.8.8/gcc-4.1.2:              0.99_01PRE-r598
+linux/debian etch/2.6.18/hppa/5.8.8/gcc-4.1.2:               0.99_01PRE-r544
+linux/debian etch/2.6.18/ia64/5.8.8/gcc-4.1.2:               0.99_01PRE-r598
+linux/debian etch/2.6.18/ia64/5.8.8/(3):                     0.99_01PRE-r598
+linux/debian etch/2.6.18/i686/5.8.8/gcc-4.1.2:               0.99_01PRE-r598
+linux/debian etch/2.6.18/x86_64/5.8.8/gcc-4.1.2:             0.99_01PRE-r598
+linux/debian etch/2.6.18/ppc/5.8.8/gcc-4.1.2:                0.99_01PRE-r598
+linux/ubuntu intrepid/2.6.27/i686/5.10.0/gcc-4.3.2:          0.99_01PRE-r598
+linux/ubuntu intrepid/2.6.27/x86_64/5.10.0/gcc-4.3.2:        0.99_01PRE-r598
+linux/ubuntu hardy/2.6.24/x86_64/5.8.8/gcc-4.2.3:            0.99_01PRE-r598
+MSWin32/?/?/?/?/MSVC: (XS)(4)                                0.99
+MSWin32/XP home SP3/strawberry/x86/5.8.8.4/gcc-3.4.5: (XS)   0.99_01PRE-r598
+MSWin32/XP home SP3/strawberry/x86/5.10.0.4/gcc-3.4.5: (XS)  0.99_01PRE-r598
+MSWin32/XP home SP3/CYGWIN_NT-5.1/x86/5.8.8/gcc-3.4.4:       0.99_01PRE-r598
+netbsd/4.0/GENERIC/i386/5.8.8/gcc-4.1.2:                     0.99_01PRE-r598
+openbsd/4.3/GENERIC/i386/5.8.8/gcc-3.3.5:                    0.99_01PRE-r598
+Solaris/5.10/2008-10/sun4u/5.8.4/sc:                         0.99_01PRE-r598
+Solaris/5.10/2008-10/sun4u/5.8.4/(1):                        0.99_01PRE-r598
+Solaris/5.10/2006-06/i86pc/5.8.4/(1):                        0.99_01PRE-r598
+Solaris/OpenSolaris2008-05/snv_86/i86pc/5.8.4/sc:            0.99_01PRE-r598
+Solaris/OpenSolaris2008-05/snv_86/i86pc/5.8.4/(1):           0.99_01PRE-r598
+Solaris/OpenSolaris2008-11/snv_101b/i86pc/5.8.4/sc:          0.99_01PRE-r598
+Solaris/OpenSolaris2008-11/snv_101b/i86pc/5.8.4/(1):         0.99_01PRE-r598
+Solaris/Nexenta2.0rc1/snv_104/i86pc/5.8.8/gcc-4.2.3:         0.99_01PRE-r598
+VMS/OpenVMS/V7.3-1/alpha/5.8.7/DEC cc 60590001:(5)           FAIL
+(XS) only XS works on this platform
+(1) Sun C used to compile perl, gcc used to compile Proc::Exists
+(2) c/ansi c used to compile perl, gcc used to compile Proc::Exists. 
+also, since a gcc is installed that can only emit 64 bit binaries, only
+perl64/xs was tested (perl32 passed pureperl tests though)
+(3) gcc used to compile perl, icc used to compile Proc::Exists
+(4) built&tested by someone else: http://trouchelle.com/ppm/Proc-Exists.ppd
+(5) "make" lives in the binary "mmk" on VMS
 
 --- platforms tested via cpants ---
 ## see: http://www.nntp.perl.org/group/perl.cpan.testers/$test_id
@@ -105,6 +109,6 @@ solaris10/x86         | 5.8.8,  5.10.0
 winxp/sp2/strawberry  | 5.10.0
 
 --- untested platforms ---
-win:   vista? 64-bit windows? non-NT windows: winME, w98, w95? activestate?
-other: macOS<10, VMS, BeOS, RISCOS, Netware3, etc.
+win:   ia64/amd64 windows, non-NT windows: winME, w98, w95.
+other: VMS, macOS<10, BeOS, RISCOS, Netware3, etc.
 

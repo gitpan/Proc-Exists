@@ -9,26 +9,30 @@ require Exporter;
 use base 'Exporter';
 @EXPORT_OK = qw(pexists);
 
-$VERSION = '0.99';
+$VERSION = '0.99_01';
 
-eval {
-	require XSLoader;
-	XSLoader::load('Proc::Exists', $VERSION); 
-}; if($@) {
-	#NOTE: don't need to worry about i18n, {XS|Dyna}Loader complain in english.
-	if($@ =~ /^Can.t\s+locate\s+loadable\s+object\s+for\s+module\s+Proc::Exists/) {
-		#this usually means we want to use pureperl
-	} elsif($@ =~ /Proc::Exists\s+object\s+version\s+\S+\s+does\s+not\s+match\s+bootstrap\s+parameter/ ) {
-		die "ERROR: it looks like you have a previous Proc::Exists version's ".
-           "object file(s) somewhere in \@INC! you will have to remove ".
-           "these and reinstall Proc::Exists -- $@"; 
-	} else {
-		#there was a problem loading the XS, fall back to pureperl
-		warn "WARNING: can't load XS, falling back to pureperl: $@\n"; 
+my $use_pureperl = $Proc::Exists::Configuration::want_pureperl; 
+if(!$use_pureperl) {
+	eval {
+		require XSLoader;
+		XSLoader::load('Proc::Exists', $VERSION); 
+	}; if($@) {
+		#NOTE: don't need to worry about i18n, {XS|Dyna}Loader complain in english.
+		if($@ =~ /Proc::Exists\s+object\s+version\s+\S+\s+does\s+not\s+match\s+bootstrap\s+parameter/ ) {
+			warn "WARNING: it looks like you have a previous Proc::Exists ".
+			     "version's object file(s) somewhere in \@INC! you will have ".
+			     "to remove these and reinstall Proc::Exists. for now, we are ".
+			     "falling back to pureperl, expect degraded performance: $@\n"; 
+		} else {
+			warn "WARNING: can't load XS. falling back to pureperl, ".
+			     "expect degraded performance: $@\n"; 
+		}
+		$use_pureperl = 1;
 	}
+}
+
+if($use_pureperl) {
 	#warn "using pure perl mode, expect degraded performance\n";
-	my $EPERM = $Proc::Exists::Configuration::EPERM; 
-	my $ESRCH = $Proc::Exists::Configuration::ESRCH; 
 	my $pp_pexists = sub {
 		my @pids = @_; 
 		my %args = ref($pids[-1]) ? %{pop(@pids)} : ();
@@ -56,9 +60,9 @@ eval {
 			if (kill 0, $pid) {
 				$ret = 1;
 			} else {
-				if($! == $EPERM) {
+				if($! == $Proc::Exists::Configuration::EPERM) {
 					$ret = 1;
-				} elsif($! == $ESRCH) {
+				} elsif($! == $Proc::Exists::Configuration::ESRCH) {
 					$ret = 0;
 				} elsif($^O eq "MSWin32") {
 					die "can't do pure perl on MSWin32 - \$!: (".(0+$!)."): $!"; 

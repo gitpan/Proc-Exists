@@ -8,15 +8,14 @@ require Config;
 
 diag( "osname: $^O" );
 my $ccname = $Config::Config{ccname};
-   $ccname = 'gcc' if(exists $Config::Config{gccversion});
+   $ccname = 'gcc' if($Config::Config{gccversion});
    $ccname = '(unknown compiler)' unless $ccname;
 my $ccversion = ($ccname eq 'gcc') ?
                 $Config::Config{gccversion} :
-                $Config::Config{version};
+                $Config::Config{ccversion};
    $ccversion = '(unknown version)' unless $ccversion;
-diag( "cc: $ccname $ccversion" );
-diag( "perl version: ". ($Config::Config{api_versionstring} || 
-                    $Config::Config{version}) );
+diag( "perl cc: $ccname $ccversion" );
+diag( "perl version: ". $Config::Config{version} );
 eval {
 	require POSIX;
 }; if($@) {
@@ -33,7 +32,7 @@ diag( "tested by a " .
 #you" signal, and store those results in a hash, then, as tersely as 
 #possible, tell me what the results were
 my %results;
-for my $pid (0..100) {
+for my $pid (0..100, $$) {
 	my $out = kill 0, $pid;
 	my $key = (0+$!).':'."$!";
 	push @{$results{$key}}, $pid;
