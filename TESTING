@@ -20,39 +20,39 @@ if (XS|PP) is specified, it means that method passed but the other failed.
 otherwise both were tested. a version of FAIL means no version has passed.
 CC KEY: gcc = gnu cc, sc = Sun C
 -----------------------------------------------------------------------------
-darwin/OSX 10.5.5/9.5.0/i386/5.8.8/gcc-4.0.1:                0.99_01PRE-r598
-darwin/OSX 10.4.11/8.11.0/ppc/5.8.6/gcc-3.3:                 0.99_01PRE-r598
-dragonflybsd/2.2.0/RELEASE/5.10.0/gcc-4.1.2:                 0.99_01PRE-r598
-freebsd/4.11/GENERIC/i386/5.5.3/gcc-2.95.2:                  0.99_01PRE-r598
-freebsd/6.2/GENERIC/i386/5.8.8/gcc-3.4.6:                    0.99_01PRE-r598
-HP-UX/11i v2/B.11.23/PA-RISC/5.8.2/HP C-ansi C:(2)           0.99_01PRE-r598
-linux/debian lenny/2.6.29-rc3/arm-gnu-eabi/5.10.0/gcc-4.3.2: 0.99_01PRE-r598
-linux/debian lenny/2.6.26/i686/5.10.0/gcc-4.3.2:             0.99_01PRE-r598
-linux/debian lenny/2.6.26/sparc64/5.10.0/gcc-4.3.2:          0.99_01PRE-r598
-linux/debian etch/2.6.18/alpha/5.8.8/gcc-4.1.2:              0.99_01PRE-r598
+darwin/OSX 10.5.5/9.5.0/i386/5.8.8/gcc-4.0.1:                0.99_02PRE-r611
+darwin/OSX 10.4.11/8.11.0/ppc/5.8.6/gcc-3.3:                 0.99_02PRE-r611
+dragonflybsd/2.2.0/RELEASE/5.10.0/gcc-4.1.2:                 0.99_01
+freebsd/4.11/GENERIC/i386/5.5.3/gcc-2.95.2:                  0.99_02PRE-r611
+freebsd/6.2/GENERIC/i386/5.8.8/gcc-3.4.6:                    0.99_02PRE-r611
+HP-UX/11i v2/B.11.23/PA-RISC/5.8.2/HP C-ansi C:(2)           0.99_02PRE-r611
+linux/debian lenny/2.6.29-rc3/arm-gnu-eabi/5.10.0/gcc-4.3.2: 0.99_01
+linux/debian lenny/2.6.26/i686/5.10.0/gcc-4.3.2:             0.99_01
+linux/debian lenny/2.6.26/sparc64/5.10.0/gcc-4.3.2:          0.99_01
+linux/debian etch/2.6.18/alpha/5.8.8/gcc-4.1.2:              0.99_01
 linux/debian etch/2.6.18/hppa/5.8.8/gcc-4.1.2:               0.99_01PRE-r544
-linux/debian etch/2.6.18/ia64/5.8.8/gcc-4.1.2:               0.99_01PRE-r598
-linux/debian etch/2.6.18/ia64/5.8.8/(3):                     0.99_01PRE-r598
-linux/debian etch/2.6.18/i686/5.8.8/gcc-4.1.2:               0.99_01PRE-r598
-linux/debian etch/2.6.18/x86_64/5.8.8/gcc-4.1.2:             0.99_01PRE-r598
-linux/debian etch/2.6.18/ppc/5.8.8/gcc-4.1.2:                0.99_01PRE-r598
-linux/ubuntu intrepid/2.6.27/i686/5.10.0/gcc-4.3.2:          0.99_01PRE-r598
-linux/ubuntu intrepid/2.6.27/x86_64/5.10.0/gcc-4.3.2:        0.99_01PRE-r598
-linux/ubuntu hardy/2.6.24/x86_64/5.8.8/gcc-4.2.3:            0.99_01PRE-r598
+linux/debian etch/2.6.18/ia64/5.8.8/gcc-4.1.2:               0.99_01
+linux/debian etch/2.6.18/ia64/5.8.8/(3):                     0.99_01
+linux/debian etch/2.6.18/i686/5.8.8/gcc-4.1.2:               0.99_02PRE-r611
+linux/debian etch/2.6.18/x86_64/5.8.8/gcc-4.1.2:             0.99_01
+linux/debian etch/2.6.18/ppc/5.8.8/gcc-4.1.2:                0.99_02PRE-r611
+linux/ubuntu intrepid/2.6.27/i686/5.10.0/gcc-4.3.2:          0.99_01
+linux/ubuntu intrepid/2.6.27/x86_64/5.10.0/gcc-4.3.2:        0.99_02PRE-r611
+linux/ubuntu hardy/2.6.24/x86_64/5.8.8/gcc-4.2.3:            0.99_02PRE-r611
 MSWin32/?/?/?/?/MSVC: (XS)(4)                                0.99
-MSWin32/XP home SP3/strawberry/x86/5.8.8.4/gcc-3.4.5: (XS)   0.99_01PRE-r598
-MSWin32/XP home SP3/strawberry/x86/5.10.0.4/gcc-3.4.5: (XS)  0.99_01PRE-r598
-MSWin32/XP home SP3/CYGWIN_NT-5.1/x86/5.8.8/gcc-3.4.4:       0.99_01PRE-r598
-netbsd/4.0/GENERIC/i386/5.8.8/gcc-4.1.2:                     0.99_01PRE-r598
-openbsd/4.3/GENERIC/i386/5.8.8/gcc-3.3.5:                    0.99_01PRE-r598
-Solaris/5.10/2008-10/sun4u/5.8.4/sc:                         0.99_01PRE-r598
-Solaris/5.10/2008-10/sun4u/5.8.4/(1):                        0.99_01PRE-r598
-Solaris/5.10/2006-06/i86pc/5.8.4/(1):                        0.99_01PRE-r598
-Solaris/OpenSolaris2008-05/snv_86/i86pc/5.8.4/sc:            0.99_01PRE-r598
-Solaris/OpenSolaris2008-05/snv_86/i86pc/5.8.4/(1):           0.99_01PRE-r598
-Solaris/OpenSolaris2008-11/snv_101b/i86pc/5.8.4/sc:          0.99_01PRE-r598
-Solaris/OpenSolaris2008-11/snv_101b/i86pc/5.8.4/(1):         0.99_01PRE-r598
-Solaris/Nexenta2.0rc1/snv_104/i86pc/5.8.8/gcc-4.2.3:         0.99_01PRE-r598
+MSWin32/XP home SP3/strawberry/x86/5.8.8.4/gcc-3.4.5: (XS)   0.99_02PRE-r611
+MSWin32/XP home SP3/strawberry/x86/5.10.0.4/gcc-3.4.5: (XS)  0.99_02PRE-r611
+MSWin32/XP home SP3/CYGWIN_NT-5.1/x86/5.8.8/gcc-3.4.4:       0.99_02PRE-r611
+netbsd/4.0/GENERIC/i386/5.8.8/gcc-4.1.2:                     0.99_02PRE-r611
+openbsd/4.3/GENERIC/i386/5.8.8/gcc-3.3.5-propolice:          0.99_02PRE-r611
+Solaris/5.10/2008-10/sun4u/5.8.4/sc:                         0.99_01
+Solaris/5.10/2008-10/sun4u/5.8.4/(1):                        0.99_01
+Solaris/5.10/2006-06/i86pc/5.8.4/(1):                        0.99_02PRE-r611
+Solaris/OpenSolaris2008-05/snv_86/i86pc/5.8.4/sc:            0.99_02PRE-r611
+Solaris/OpenSolaris2008-05/snv_86/i86pc/5.8.4/(1):           0.99_02PRE-r611
+Solaris/OpenSolaris2008-11/snv_101b/i86pc/5.8.4/sc:          0.99_02PRE-r611
+Solaris/OpenSolaris2008-11/snv_101b/i86pc/5.8.4/(1):         0.99_02PRE-r611
+Solaris/Nexenta2.0rc1/snv_104/i86pc/5.8.8/gcc-4.2.3:         0.99_02PRE-r611
 VMS/OpenVMS/V7.3-1/alpha/5.8.7/DEC cc 60590001:(5)           FAIL
 (XS) only XS works on this platform
 (1) Sun C used to compile perl, gcc used to compile Proc::Exists

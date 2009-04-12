@@ -15,12 +15,15 @@ ok($required_ok);
 #if we were able to load, output some extra info
 
 if($required_ok) {
-	my $impl = $Proc::Exists::pureperl ? "pureperl" : "XS";
+	my $impl = $Proc::Exists::pureperl ? "pureperl" :
+		"XS (via ".$Proc::Exists::_loader.")";
 	diag( "Testing Proc::Exists $Proc::Exists::VERSION, $impl implementation" );
 	diag( "EPERM: $Proc::Exists::Configuration::EPERM, ".
 	      "ESRCH: $Proc::Exists::Configuration::ESRCH");
+	#the rest of this is just to shut up the warnings pragma
 	$impl = $Proc::Exists::pureperl.$Proc::Exists::Configuration::EPERM.
-	        $Proc::Exists::Configuration::ESRCH; #shaddup, warnings pragma
-	$impl = $Proc::Exists::VERSION;  #shaddup, old versions of warnings pragma
+	        $Proc::Exists::Configuration::ESRCH; 
+	$impl = $Proc::Exists::_loader; #seperate because it can be undef with PP
+	$impl = $Proc::Exists::VERSION;  #for old versions (pre 5.6, i think)
 }
 

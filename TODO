@@ -1,12 +1,10 @@
 - it'd be nice if we could emit a custom error message if make fails
   ie, "try setting cc or cflags explicitly via Makefile.PL arguments"
-- use DynaLoader instead of XSLoader for better old version compat...
-  also we might be able to fix the version mismatch problem a better way
-- add activeperl/win32 to the stuff we test (is there free msvc stuff?)
 - check if this works with perl <5.5 (all the way back to 5.0 might work
-  except that Config came around in 5.3). set META.yml as well as Makefile.PL
-  to the version we really want: use 5.005 or whatever.
+  except that Config came around in 5.3). then set META.yml as well as 
+  Makefile.PL to the version we really want: use 5.005 or whatever.
   see http://wiki.cpantesters.org/wiki/CPANAuthorNotes for Makefile.PL info
+- add activeperl/win32 to the stuff we test? (is there free msvc stuff?)
 - it's time for a better api...
 - VMS: PIDs can be hex(?) e.g. 2341B053.
   see VMS::Process and see how they do things... perldoc perlvms too...

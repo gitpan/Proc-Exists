@@ -7,15 +7,23 @@ eval { require warnings; }; #it's ok if we can't load warnings
 
 require Exporter;
 use base 'Exporter';
-@EXPORT_OK = qw(pexists);
+@EXPORT_OK = qw( pexists );
+@ISA       = qw( Exporter );
 
-$VERSION = '0.99_01';
+$VERSION = '0.99_02';
 
 my $use_pureperl = $Proc::Exists::Configuration::want_pureperl; 
 if(!$use_pureperl) {
 	eval {
 		require XSLoader;
 		XSLoader::load('Proc::Exists', $VERSION); 
+		$Proc::Exists::_loader = 'XSLoader';
+		1;
+	} or do {
+		require DynaLoader;
+		push @ISA, 'DynaLoader';
+		$Proc::Exists::_loader = 'DynaLoader';
+		bootstrap Proc::Exists $VERSION; 
 	}; if($@) {
 		#NOTE: don't need to worry about i18n, {XS|Dyna}Loader complain in english.
 		if($@ =~ /Proc::Exists\s+object\s+version\s+\S+\s+does\s+not\s+match\s+bootstrap\s+parameter/ ) {
