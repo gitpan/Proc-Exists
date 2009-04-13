@@ -1,6 +1,7 @@
 Revision history for Proc-Exists
 
-1.00  2009-??-?? ??:?? GMT  rev. ???
+1.00  2009-04-13 02:13 GMT  rev. 621
+   - POD cleanup
 
 0.99_02 09-04-12 04:13 GMT  rev. 615
    - use DynaLoader instead of XSLoader when the latter doesn't exist

@@ -11,14 +11,16 @@
 #include <errno.h>
 #endif
 
-////can't find a good ifdef for macs pre-macos x
-//#if defined(macintosh) && !defined(MACOS_TRADITIONAL)
-//#include "../Carbon.h"
-//#include <Types.h>
-//#include <Memory.h>
-//#include <Processes.h>
-//#endif
-////with a good ifdef, compare GetProcessInformation from Mac::Processes
+/*
+ * can't find a good ifdef for macs pre-macos x. if i had one, i could
+ * use something like GetProcessInformation from Mac::Processes.
+ * #if defined(macintosh) && !defined(MACOS_TRADITIONAL)
+ * #include "../Carbon.h"
+ * #include <Types.h>
+ * #include <Memory.h>
+ * #include <Processes.h>
+ * #endif
+ */
 
 #include "ppport.h"
 #include "pexists.h"
@@ -48,7 +50,7 @@ _scalar_pexists(pids_ref, any, all)
 		int total=0;
 		int pid;
 
-		//make sure pids_ref is a ref pointing at an array with some elements
+		/* make sure pids_ref is a ref pointing at an array with some elements */
 		if ((!SvROK(pids_ref)) || (SvTYPE(SvRV(pids_ref)) != SVt_PVAV) || 
 			 ((npids = av_len((AV *)SvRV(pids_ref))) < 0)) {
 			XSRETURN_UNDEF;
@@ -63,7 +65,7 @@ _scalar_pexists(pids_ref, any, all)
 
 			exists = __pexists(pid);
 
-			//hook 1
+			/* hook 1 */
 			if( any && exists ) {
 				RETVAL = pid; break;
 			} else if( all && !exists ) {
@@ -72,9 +74,9 @@ _scalar_pexists(pids_ref, any, all)
 				total+=exists;
 			}
 		}
-		//hook 2
+		/* hook 2 */
 		if( RETVAL==RETVAL_IS_UNSET ) {
-			//make sure 'any' mode returns undef, not 0
+			/* make sure 'any' mode returns undef, not 0 */
 			if( any ) { XSRETURN_UNDEF; }
 			RETVAL = total;
 		}
@@ -95,7 +97,7 @@ _list_pexists(pids_ref)
 		int exists;
 		int pid;
 
-		//make sure pids_ref is a ref pointing at an array with some elements
+		/* make sure pids_ref is a ref pointing at an array with some elements */
 		if ((!SvROK(pids_ref)) || (SvTYPE(SvRV(pids_ref)) != SVt_PVAV) || 
 			 ((npids = av_len((AV *)SvRV(pids_ref))) < 0)) {
 			XSRETURN_UNDEF;
@@ -109,11 +111,11 @@ _list_pexists(pids_ref)
 
 			exists = __pexists(pid);
 
-			//hook 1
+			/* hook 1 */
 			if(exists) {
 				mXPUSHi(pid);
 			}
 		}
-		//(no hook 2)
+		/* (no hook 2) */
 
 

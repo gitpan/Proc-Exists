@@ -29,7 +29,7 @@ static int get_pid(SV* pid_sv) {
 			if(sscanf(pidstr, "%d", &pid) == 0) {
 				croak("got non-number pid: '%s'", pidstr);
 			} else {
-				//warn("converted %s to int: %d outside of perlapi", pidstr, pid);
+				/* warn("converted %s to int: %d outside of perlapi", pidstr, pid); */
 			}
 		} else {
 			croak("got non-integer pid: '%s'", pidstr);
@@ -49,12 +49,14 @@ static int get_pid(SV* pid_sv) {
  */
 static int __pexists(int pid) {
 #ifdef WIN32
-	// this is much faster than iterating over a process snapshot,
-	// and more closely mirrors the POSIX code, but it has a weirdness
-	// on NTish systems - namely if these exists a pid 4, pid's 5, 6,
-	// and 7 will also return true. something in the windows guts is
-	// chopping off the bottom two bits, see:
-	// http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
+	/*
+	 * this is much faster than iterating over a process snapshot,
+	 * and more closely mirrors the POSIX code, but it has a weirdness
+	 * on NTish systems - namely if these exists a pid 4, pid's 5, 6,
+	 * and 7 will also return true. something in the windows guts is
+	 * chopping off the bottom two bits, see:
+	 * http://blogs.msdn.com/oldnewthing/archive/2008/02/28/7925962.aspx
+	 */
 	HANDLE hProcess;
 
 #ifdef win32_pids_mult4
@@ -74,9 +76,11 @@ static int __pexists(int pid) {
 	int ret;
 
 	ret = kill(pid, 0);
-	//existent process w/ perms:  ret: 0
-	//existent process w/o perms: ret: -1, err: EPERM
-	//nonexistent process:        ret: -1, err: ESRCH
+	/*
+	 * existent process w/ perms:  ret: 0
+	 * existent process w/o perms: ret: -1, err: EPERM
+	 * nonexistent process:        ret: -1, err: ESRCH
+	 */
 	if(ret == 0) {
 		return 1;
 	} else if(ret == -1) {

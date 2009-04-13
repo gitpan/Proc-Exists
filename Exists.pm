@@ -10,7 +10,7 @@ use base 'Exporter';
 @EXPORT_OK = qw( pexists );
 @ISA       = qw( Exporter );
 
-$VERSION = '0.99_02';
+$VERSION = '1.00';
 
 my $use_pureperl = $Proc::Exists::Configuration::want_pureperl; 
 if(!$use_pureperl) {
@@ -158,43 +158,42 @@ extant pid - see B<CAVEATS> for more information.
 
 =head1 DESCRIPTION
 
-A simple and fast module for checking whether a process exists or
-not, regardless of whether it is a child of this process or has the
-same owner. 
+A simple, portable, and fast module for checking whether a process 
+exists or not, regardless of whether it is a child of this process or 
+has the same owner. 
 
 On POSIX systems, this is implemented by sending a 0 (test) signal to
-the pid of the process to check and examining the result and errno.
+the pid of the process to check and examining the result and errno. On
+Win32, OpenProcess() is used for a similar job.
 
 
 =head1 DEPENDENCIES
 
- * any os with a POSIX layer or win32
+ * any os with either a POSIX layer or ( win32 and a compiler )
+ * Config (needed to run Makefile.PL, but you could theoretically do 
+   without it - it is not needed at run time)
  * Test::More if you want to run 'make test'
 
-It's possible that if you don't have a C compiler, and you're
-running an "obscure" UNIX-y OS (read: not linux, *BSD, solaris,
-or Mac OS X), you might not pass make test. This is because we need
-to compare the value of $! after a call to kill() with EPERM
-and ESRCH. Not wanting to rely on Errno or POSIX, we determine EPERM 
-and ESRCH at build (Makefile.PL) time, by using POSIX or Errno if
-it exists -- but using the common values of EPERM==1 and ESRCH==3 if
-we can't load POSIX. If you find yourself on such a system, your best 
-bet is to look up EPERM and ESRCH (try grepping for them down 
-/usr/include or wherever your headers are kept). If you get hits
-back, you can edit Exists/Configuration.pm, add your values there, 
-and re-run the build process. Whether you were successful or not, 
-please send a descriptionof what you tried, as well as the output of 
-perl -V and the results of perl misc/gather-info.pl to B<< 
-<ski-cpan@allafrica.com> >> - making sure to include Proc::Exists in the 
-subject line (or else I won't read it!) If you had no success, 
+If you are trying to install the pureperl implementation, and EPERM and 
+ESRCH are not autodetected properly by POSIX.pm, your best bet is to 
+look up EPERM and ESRCH (try grepping for them down /usr/include or 
+wherever your headers are kept). If you get hits back, you can edit 
+Exists/Configuration.pm, add your values there, and re-run the build 
+process. Whether you were successful or not, please send a description 
+of what you tried, as well as the output of perl -V and the output of
+perl misc/gather-info.pl and perl t/00-info.t to
+B<< <ski-cpan@allafrica.com> >> - making sure to include Proc::Exists in 
+the subject line (or else I won't read it!) If you had no success, 
 hopefully I'll be able to provide a patch for you, and a fix/workaround 
 for the next release of Proc::Exists.
 
-There is no pure perl implementation under Windows. The solution
-is to use Strawberry Perl L<http://strawberryperl.com/>.
+There is no pure perl implementation under Windows. The usual solution
+is to use Strawberry Perl L<http://strawberryperl.com/> (although 
+ActivePerl and MSVC have also been reported to work).
 
 Any other OS without a POSIX emulation layer will probably be
-completely non-functional (unless it implements C<kill()>).
+completely non-functional unless it implements C<kill()> in a UNIX-esque 
+fashion.
 
 
 =head1 CAVEATS

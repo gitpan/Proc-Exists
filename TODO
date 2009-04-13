@@ -4,6 +4,7 @@
   except that Config came around in 5.3). then set META.yml as well as 
   Makefile.PL to the version we really want: use 5.005 or whatever.
   see http://wiki.cpantesters.org/wiki/CPANAuthorNotes for Makefile.PL info
+- migrate to Module::Build
 - add activeperl/win32 to the stuff we test? (is there free msvc stuff?)
 - it's time for a better api...
 - VMS: PIDs can be hex(?) e.g. 2341B053.
