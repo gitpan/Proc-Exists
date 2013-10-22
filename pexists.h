@@ -66,7 +66,7 @@ static int __pexists(int pid) {
 #endif
 
 	hProcess = OpenProcess( PROCESS_QUERY_INFORMATION, FALSE, pid );
-	if(hProcess == NULL) { 
+	if(hProcess == NULL) {
 		return 0;
 	} else {
 		CloseHandle( hProcess );

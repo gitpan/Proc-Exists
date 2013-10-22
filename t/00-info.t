@@ -19,10 +19,13 @@ diag( "perl version: ". $Config::Config{version} );
 eval {
 	require POSIX;
 }; if($@) {
-	diag( "POSIX::uname unavailable, can't load POSIX" );
+	diag( "can't load POSIX: uname(), EPERM, and ESRCH details unavailable");
 } else {
 	diag( "POSIX::uname: ".join(" - ", POSIX::uname()) );
+  diag( "EPERM: ".POSIX->EPERM." ".
+        "ESRCH: ".POSIX->ESRCH      );
 }
+
 diag( "tested by a " .
          (defined($ENV{AUTOMATED_TESTING}) && $ENV{AUTOMATED_TESTING} ?
          "smoker" : 

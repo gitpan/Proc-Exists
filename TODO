@@ -1,5 +1,14 @@
+- errno 9 (Bad file descriptor) was the result on these pids: 0
+  from: http://www.cpantesters.org/cpan/report/6530781
+  how do we handle this? we should throw an error if its an illegal pid?
+  ... also read more cpants results from 1.00 and look for anything suspect
+- pull CFLAGS from environment if they exist?
+- should eval { require warnings; }; be inside BEGIN?
 - it'd be nice if we could emit a custom error message if make fails
   ie, "try setting cc or cflags explicitly via Makefile.PL arguments"
+  perhaps use a bin/cc-exec.pl that calls system cc using $ENV{PATH} 
+  and emits that message if cc failed? note: system's behavior wrt
+  failing commands is weird -- be careful
 - check if this works with perl <5.5 (all the way back to 5.0 might work
   except that Config came around in 5.3). then set META.yml as well as 
   Makefile.PL to the version we really want: use 5.005 or whatever.
@@ -61,9 +70,6 @@ for better test coverage of pureperl stuff via cpants, make a test
 script that (for information purposes only) runs pureperl tests
 seperately? this would break win32/{strawberry|activeperl}, so we'd have 
 to check $^O and skip in that case...
-
-svnamdin dump + svnadmin load.  dump from the old, load into the new
-to get this stuff into chronicle svn
 
 Perl::Critic and Kwalitee info:
   http://www.slideshare.net/kcowgill/testing-code-and-assuring-quality/

@@ -4,6 +4,7 @@ $|++;
 use ExtUtils::MakeMaker;
 use Config qw(%Config); #for $Config{cc} 
 use Getopt::Long;
+use Cwd;
 
 use strict;
 
@@ -21,22 +22,12 @@ unless( GetOptions( 'cc=s'        => \$force_cc,
 	    "       the shortcut argument \"gcc\" which uses options for that\n".
 	    "       compiler. -cc and -cflags have no effect when used with -pp\n";
 }
+#-cc or -cflags imply -xs
+$force_pp = 'n' if($force_cflags or $force_cc);
 
 #TODO: is this general enough?
 if($force_cflags eq 'gcc') {
 	$force_cflags = '-O -g -fPIC -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64';
-}
-
-### determine/sanity check EPERM and ESRCH for this system...
-### corelist sez POSIX has been there since perl5... here's hoping
-### this is true in the real world... get EPERM and ESRCH from there.
-### if we can't, tell the user to edit Configuration.pm
-use POSIX qw(:errno_h);
-my ($EPERM, $ESRCH) = (EPERM, ESRCH);
-unless((defined $EPERM) and (defined $ESRCH)) {
-	warn "EPERM and ESRCH could not be determined - if you have problems ".
-	     "try editing Exists/Configuration.pm and mail the author to let ".
-	     "us know how it goes (see perldoc for contact info)";
 }
 
 ### non-compile-related platform specific hacks go here, for example,
@@ -67,7 +58,6 @@ my %Makefile = (
 	                       'Exporter'            => 0,
 	                       'ExtUtils::MakeMaker' => 0,
 	                       'Getopt::Long'        => 0,
-	                       'POSIX'               => 0,
 	                       'Test::More'          => 0, 
                         },
 	($] >= 5.005 ?     ## Add these new keywords supported since 5.005
@@ -180,9 +170,7 @@ if( $force_cflags ) {
 ### (finished tinkering with cc related variables in Makefile)
 
 ### write out Configuration.pm and Makefile
-write_config( defined $EPERM ? (EPERM => $EPERM) : (),
-              defined $ESRCH ? (ESRCH => $ESRCH) : (),
-              defined $use_pp ? (want_pureperl => $use_pp ? 1 : 0) : () );
+write_config( defined $use_pp ? (want_pureperl => $use_pp ? 1 : 0) : () );
 WriteMakefile(%Makefile); 
 
 ### return -1, 0, or 1 based on whether the first version string is 
@@ -202,12 +190,11 @@ sub compare_version {
 	return 0;
 }
 
-### write_config(EPERM => 1, ESRCH => 3) updates the relevant entries
-### in Configuration.pm
+### update the relevant entries in Configuration.pm
 sub write_config {
 	my %args = @_; 
-	
-	my $wd = POSIX::getcwd;
+
+	my $wd = getcwd();
 	chdir('Exists') || die "can't change to Exists subdirectory: $!"; 
 	open(CONF, '<Configuration.pm') || die "can't read Configuration.pm: $!"; 
 	my @lines = map { chomp; $_ } <CONF>; 
@@ -261,7 +248,7 @@ EOF
 
 	#sometimes $Config{CC} is not the answer (e.g. solaris10 w/ gcc but
 	#no sun c package installed)...
-	my @cc_alternatives = ( $Config{cc}, qw( cc gcc egcs icc pcc lcc ));
+	my @cc_alternatives = ( $Config{cc}, qw( cc gcc clang egcs icc pcc lcc ));
 	#if all fails but CC env var is set, try it, maybe it will link
 	push @cc_alternatives, $ENV{CC} if($ENV{CC}); 
 	if(!$force_cc && ($^O eq 'hpux')) {

@@ -4,28 +4,18 @@ use strict;
 eval { require warnings; }; #it's ok if we can't load warnings
 
 use Proc::Exists qw(pexists);
+use Getopt::Long;
 
 my $interval = 0.01;
 my $any      = 0;
 
 #note, synonyms defined for compatibility with Proc::ProcessTable version
-while(defined($ARGV[0]) && ($ARGV[0] =~ /^\-/)) {
-	my $arg = shift(@ARGV);
-	#-a, -e, -any, -exit are all synonyms
-	if($arg =~ /^\-+[ae]/) {
-		$any = 1
-	#-s, -i, -sleep, -interval are all synonyms
-	} elsif($arg =~ /^\-+[is]/) {
-		if($arg =~ /=/) {
-			$interval = $arg;
-			$interval =~ s/^.*=//;
-		} else {
-			#next argument is interval
-			$interval = shift(@ARGV);
-		}
-	} else {
-		die "usage: $0 [ -[is]=interval | -[ae] ] pid1, pid2... pidn\n";
-	}
+Getopt::Long::Configure ("bundling");
+unless( GetOptions( 'a|e|any|exit'         => \$any,
+                    'i|s|interval|sleep=f' => \$interval ) ) {
+	die "usage: $0 [ -[is]=interval | -[ae] ] pid1, pid2... pidn\n".
+	    "'interval' or 'sleep' can be used in place of -i/-s\n".
+	    "'any' or 'exit' can be used in place of -a/-e\n";
 }
 
 my @pids = grep { $_ != $$ } @ARGV; #don't ever wait on self, assume user
@@ -49,29 +39,21 @@ without some features, see below)
 
 pswait [options] pid1, pid2, ... pidn
 
-=head1 USAGE
-
-Options:
-   -a --any           exit after the first of these procs end
-                      alias -e, --exit
-   -i=# --interval=#  change how often we poll (default .01sec)
-                      alias -s, --sleep
-
 =head1 OPTIONS
 
 =over 3
 
-=item B<-a, --any>
+=item B<-a, --any> (aka B<-e / --exit>)
 
 Terminate as soon as any of these processes are gone, instead of waiting 
 on them all, which is the default behavior.
 
-=item B<-i, --interval>
+=item B<-i, --interval>=# (aka B<-s / --sleep>)
 
 Amount of time (in seconds, decimals ok) to wait between checking for 
 process updates. Note that this check is cheap, and even if you are 
 checking lots of processes, specifying a value near your machine's HZ 
-value is probably fine.
+value is probably fine. Default is 0.01 seconds.
 
 =back
 
